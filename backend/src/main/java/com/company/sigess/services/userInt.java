@@ -1,9 +1,9 @@
 package com.company.sigess.services;
 
-import com.company.sigess.models.User;
+import com.company.sigess.models.DTO.UserDTO;
 
 import java.util.List;
 
 public interface userInt {
-    public List<User> getAllUsers();
+     List<UserDTO> getAllUsers();
 }

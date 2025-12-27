@@ -1,39 +1,54 @@
 package com.company.sigess.repositories;
-
-import com.company.sigess.models.User;
+import com.company.sigess.models.DTO.UserDTO;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class UserRepository {
-    private static List<User> users = new ArrayList<>();
-    private static int nextId = 1;
 
-    static {
-        // Initialize with sample data
-        users.add(new User(nextId++, "John Doe", "john@example.com"));
-        users.add(new User(nextId++, "Jane Smith", "jane@example.com"));
+    private  Connection connection;
+
+    public UserRepository( ) {
+
+
     }
 
-    public List<User> findAll() {
-        return new ArrayList<>(users);
-    }
+    public List<UserDTO> findAll() {
 
-    public User findById(int id) {
-        return users.stream()
-                .filter(user -> user.getId() == id)
-                .findFirst()
-                .orElse(null);
-    }
-
-    public User save(User user) {
-        if (user.getId() == 0) {
-            user.setId(nextId++);
+        try {
+            this.connection = DriverManager.getConnection(
+                    "jdbc:postgresql://localhost:5432/DEVSIGESS",
+                    "postgres",
+                    "123"
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException("Error connecting to DB", e);
         }
-        users.add(user);
-        return user;
+
+        List<UserDTO> users = new ArrayList<>();
+
+        String sql = "SELECT * FROM users WHERE active = true";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                UserDTO user = new UserDTO(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("role_id")
+
+                );
+                users.add(user);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();   // 👈 IMPORTANT
+            throw new RuntimeException("Error fetching users", e);
+        }
+
+        return users;
     }
 
-    public boolean delete(int id) {
-        return users.removeIf(user -> user.getId() == id);
-    }
 }
