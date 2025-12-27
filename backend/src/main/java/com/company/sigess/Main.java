@@ -1,17 +1,31 @@
 package com.company.sigess;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpExchange;
+import com.company.sigess.controllers.UserController;
+import java.io.IOException;
+import java.net.InetSocketAddress;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
-        }
+public class Main {
+    private static final int PORT = 8080;
+
+    public static void main(String[] args) throws IOException {
+        HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
+
+        // Route to controllers
+        server.createContext("/api/users", new UserController());
+        //server.createContext("/api/health", this::handleHealth);
+
+        server.setExecutor(null);
+        server.start();
+        System.out.println("Server running on http://localhost:" + PORT);
+    }
+
+    private void handleHealth(HttpExchange exchange) throws IOException {
+        String response = "{\"status\": \"UP\"}";
+        exchange.getResponseHeaders().set("Content-Type", "application/json");
+        exchange.sendResponseHeaders(200, response.getBytes().length);
+        exchange.getResponseBody().write(response.getBytes());
+        exchange.close();
     }
 }
