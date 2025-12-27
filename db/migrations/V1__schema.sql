@@ -66,5 +66,24 @@ CREATE TABLE IF NOT EXISTS incident_history (
         REFERENCES users(id)
 );
 
+CREATE TABLE IF NOT EXISTS incident_attachments (
+    id SERIAL PRIMARY KEY,
+    incident_id INTEGER NOT NULL,
+    original_filename VARCHAR(255) NOT NULL,
+    stored_filename VARCHAR(255) NOT NULL UNIQUE,
+    file_size INTEGER NOT NULL,  -- in bytes
+    mime_type VARCHAR(100) NOT NULL,
+    description TEXT,
+    uploaded_by INTEGER NOT NULL,
+    uploaded_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_attachments_incident
+        FOREIGN KEY (incident_id)
+        REFERENCES incidents(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_attachments_user
+        FOREIGN KEY (uploaded_by)
+        REFERENCES users(id)
+);
+
 COMMIT;
 

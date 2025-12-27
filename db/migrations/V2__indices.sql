@@ -25,5 +25,11 @@ CREATE INDEX IF NOT EXISTS idx_incidents_critical_date
 -- Audit history access
 CREATE INDEX IF NOT EXISTS idx_incident_history_incident_date
     ON incident_history(incident_id, changed_at);
+    
+    CREATE INDEX IF NOT EXISTS idx_attachments_incident_id 
+    ON incident_attachments(incident_id);
+
+CREATE INDEX IF NOT EXISTS idx_attachments_uploaded_at 
+    ON incident_attachments(uploaded_at);
 
 COMMIT;
