@@ -1,15 +1,15 @@
 package com.company.sigess.services;
 
 import com.company.sigess.models.DTO.UserDTO;
-import com.company.sigess.repositories.UserRepository;
-import java.sql.Connection;
+import com.company.sigess.repositories.UserDAO;
+
 import java.util.List;
 
 public class UserImp implements userInt{
-    private final UserRepository repository;
+    private final UserDAO repository;
 
     public UserImp( ) {
-        this.repository = new UserRepository();
+        this.repository = new UserDAO();
     }
 
     @Override
