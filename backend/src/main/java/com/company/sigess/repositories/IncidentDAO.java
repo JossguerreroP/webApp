@@ -3,7 +3,6 @@ package com.company.sigess.repositories;
 import com.company.sigess.models.DTO.IncidentCriteria;
 import com.company.sigess.models.DTO.IncidentDTO;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 

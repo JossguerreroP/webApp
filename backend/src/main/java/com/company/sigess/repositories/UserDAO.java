@@ -1,7 +1,6 @@
 package com.company.sigess.repositories;
 import com.company.sigess.models.DTO.UserDTO;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class UserDAO {

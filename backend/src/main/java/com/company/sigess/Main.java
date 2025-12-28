@@ -1,12 +1,12 @@
 package com.company.sigess;
-import com.sun.net.httpserver.HttpServer;
+
 import java.io.IOException;
-import java.net.InetSocketAddress;
+
 import java.util.Properties;
 
 public class Main {
     private static final Properties appProps = new Properties();  // application.properties// db/database.properties
-    private static HttpServer server;
+
 
     public static void main(String[] args) throws IOException {
         loadAppConfig();
