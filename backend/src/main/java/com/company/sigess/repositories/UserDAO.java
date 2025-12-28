@@ -9,22 +9,13 @@ public class UserRepository {
 
     private  Connection connection;
 
-    public UserRepository( ) {
-
-
+    public UserRepository() {
+        this.connection = DBConn
+                .getInstance()
+                .getConnection();
     }
 
     public List<UserDTO> findAll() {
-
-        try {
-            this.connection = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/DEVSIGESS",
-                    "postgres",
-                    "123"
-            );
-        } catch (SQLException e) {
-            throw new RuntimeException("Error connecting to DB", e);
-        }
 
         List<UserDTO> users = new ArrayList<>();
 
