@@ -5,7 +5,7 @@ import com.company.sigess.repositories.UserDAO;
 
 import java.util.List;
 
-public class UserImp implements userInt{
+public class UserImp implements UserInt {
     private final UserDAO repository;
 
     public UserImp( ) {

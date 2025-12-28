@@ -34,15 +34,24 @@ CREATE TABLE IF NOT EXISTS incidents (
     type VARCHAR(50) NOT NULL,
     level VARCHAR(20) NOT NULL,
     status VARCHAR(20) NOT NULL,
-    date DATE NOT NULL,
-    responsible VARCHAR(100) NOT NULL,
+
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    responsible_id INTEGER NOT NULL,
     area_id INTEGER NOT NULL,
     created_by INTEGER NOT NULL,
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+
     version INTEGER NOT NULL DEFAULT 1,
+
+    CONSTRAINT fk_incidents_responsible
+        FOREIGN KEY (responsible_id)
+        REFERENCES users(id),
+
     CONSTRAINT fk_incidents_area
         FOREIGN KEY (area_id)
         REFERENCES areas(id),
+
     CONSTRAINT fk_incidents_created_by
         FOREIGN KEY (created_by)
         REFERENCES users(id)

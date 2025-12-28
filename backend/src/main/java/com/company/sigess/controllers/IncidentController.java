@@ -1,7 +1,7 @@
 package com.company.sigess.controllers;
 
 import com.company.sigess.models.DTO.IncidentDTO;
-import com.company.sigess.services.IncidentServiceImp;
+import com.company.sigess.services.IncidentImp;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 public class IncidentController implements HttpHandler {
 
-    private IncidentServiceImp service = new IncidentServiceImp();
+    private IncidentImp service = new IncidentImp();
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
