@@ -145,6 +145,17 @@ public class IncidentDAO {
         }
     }
 
+    public boolean delete(int id) {
+        String sql = "DELETE FROM incidents WHERE id = ?";
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error al eliminar el incidente", e);
+        }
+    }
+
     public IncidentDTO findById(int id) {
         String sql = "SELECT * FROM incidents WHERE id = ?";
         System.out.println("[DEBUG_LOG] Executing findById for ID: " + id);

@@ -60,6 +60,15 @@ public class IncidentService implements IncidentInt {
         return this.repository.update(incident);
     }
 
+    @Override
+    public boolean deleteIncident(int id) {
+        IncidentDTO existing = this.repository.findById(id);
+        if (existing == null) {
+            throw new RuntimeException("Incidente no encontrado");
+        }
+        return this.repository.delete(id);
+    }
+
     private void checkAndLogChange(int incidentId, int userId, String field, String oldVal, String newVal) {
         if (newVal != null && !newVal.equals(oldVal)) {
             historyRepository.logChange(incidentId, userId, field, oldVal, newVal);

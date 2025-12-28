@@ -154,4 +154,26 @@ public class IncidentController extends HttpServlet {
         resp.setContentType("application/json");
         resp.getWriter().write("{\"error\":\"" + message + "\"}");
     }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String pathInfo = req.getPathInfo();
+        if (pathInfo == null || !pathInfo.matches("/\\d+")) {
+            sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid ID");
+            return;
+        }
+
+        try {
+            int id = Integer.parseInt(pathInfo.substring(1));
+            boolean deleted = service.deleteIncident(id);
+
+            if (deleted) {
+                resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            } else {
+                sendError(resp, HttpServletResponse.SC_NOT_FOUND, "Incident not found");
+            }
+        } catch (Exception e) {
+            sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
 }
