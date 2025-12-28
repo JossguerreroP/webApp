@@ -9,22 +9,11 @@ public class Main {
     private static HttpServer server;
 
     public static void main(String[] args) throws IOException {
-
         loadAppConfig();
         printStartupInfo();
 
-
-        // Inicia server con puerto configurable
-        int port = Integer.parseInt(getApp("server.port"));
-        server = HttpServer.create(new InetSocketAddress(port), 0);
-
-        //  Routes
-        server.createContext("/api/users", new com.company.sigess.controllers.UserController());
-        server.createContext("/api/incidents", new com.company.sigess.controllers.UserController());
-        server.setExecutor(null);
-        server.start();
-
-        System.out.println("SIGESS Server ready! http://localhost:" + port);
+        System.out.println("SIGESS Backend (Servlet Mode)");
+        System.out.println("Para ejecutar, despliegue el archivo WAR en un contenedor de Servlets (ej. Tomcat)");
     }
 
     private static void loadAppConfig() {

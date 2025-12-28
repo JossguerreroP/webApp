@@ -1,105 +1,118 @@
 package com.company.sigess.controllers;
 
+import com.company.sigess.models.DTO.IncidentCriteria;
 import com.company.sigess.models.DTO.IncidentDTO;
-import com.company.sigess.services.IncidentImp;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
+import com.company.sigess.services.IncidentService;
+import com.google.gson.*;
+import java.lang.reflect.Type;
+import java.time.format.DateTimeFormatter;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.List;
 
-public class IncidentController implements HttpHandler {
+@WebServlet("/api/incidents/*")
+public class IncidentController extends HttpServlet {
 
-    private IncidentImp service = new IncidentImp();
+    private final IncidentService service = new IncidentService();
+    private final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(LocalDateTime.class, new JsonSerializer<LocalDateTime>() {
+                @Override
+                public JsonElement serialize(LocalDateTime src, Type typeOfSrc, JsonSerializationContext context) {
+                    return new JsonPrimitive(src.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                }
+            })
+            .registerTypeAdapter(LocalDateTime.class, new JsonDeserializer<LocalDateTime>() {
+                @Override
+                public LocalDateTime deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                    return LocalDateTime.parse(json.getAsString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                }
+            })
+            .setPrettyPrinting()
+            .create();
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
-        String method = exchange.getRequestMethod();
-        String path = exchange.getRequestURI().getPath();
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String pathInfo = req.getPathInfo();
 
         try {
-            if ("GET".equals(method)) {
-
-                if (path.equals("/api/incidents")) {
-                    handleGetAllIncidents(exchange);
-                }
-                else if (path.matches("/api/incidents/\\d+")) {
-                    handleGetIncidentById(exchange);
-                }
-                else {
-                    sendResponse(exchange, 404, "{\"error\":\"Endpoint not found\"}");
-                }
-
-            } else if ("POST".equals(method)) {
-
-                if (path.equals("/api/incidents")) {
-                    handleCreateIncident(exchange);
-                }
-                else {
-                    sendResponse(exchange, 404, "{\"error\":\"Endpoint not found\"}");
-                }
-
+            if (pathInfo == null || pathInfo.equals("/")) {
+                handleGetAllIncidents(req, resp);
+            } else if (pathInfo.matches("/\\d+")) {
+                handleGetIncidentById(req, resp);
             } else {
-                sendResponse(exchange, 405, "{\"error\":\"Method not allowed\"}");
+                sendError(resp, HttpServletResponse.SC_NOT_FOUND, "Endpoint not found");
             }
-
         } catch (Exception e) {
-            sendResponse(exchange, 500, "{\"error\":\"" + e.getMessage() + "\"}");
+            sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
-    // ================= HANDLERS =================
-
-    private void handleGetAllIncidents(HttpExchange exchange) throws IOException {
-        List<IncidentDTO> incidents = service.getAllIncidents();
-
-        StringBuilder json = new StringBuilder("[");
-        for (int i = 0; i < incidents.size(); i++) {
-            json.append(incidents.get(i).toString());
-            if (i < incidents.size() - 1) json.append(",");
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            IncidentDTO incident = gson.fromJson(req.getReader(), IncidentDTO.class);
+            
+            // Simular usuario autenticado (esto se debería sacar de la sesión/token)
+            if (incident.getCreatedBy() == 0) incident.setCreatedBy(1); 
+            
+            IncidentDTO created = service.createIncident(incident);
+            sendResponse(resp, HttpServletResponse.SC_CREATED, created);
+        } catch (Exception e) {
+            sendError(resp, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         }
-        json.append("]");
-
-        sendResponse(exchange, 200, json.toString());
     }
 
-    private void handleGetIncidentById(HttpExchange exchange) throws IOException {
-        String path = exchange.getRequestURI().getPath();
-        String idStr = path.substring(path.lastIndexOf("/") + 1);
+    private void handleGetAllIncidents(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        IncidentCriteria criteria = new IncidentCriteria();
+
+        if (req.getParameter("status") != null) criteria.setStatus(req.getParameter("status"));
+        if (req.getParameter("level") != null) criteria.setLevel(req.getParameter("level"));
+        if (req.getParameter("areaId") != null) criteria.setAreaId(Integer.parseInt(req.getParameter("areaId")));
+        if (req.getParameter("responsibleId") != null) criteria.setResponsibleId(Integer.parseInt(req.getParameter("responsibleId")));
+        if (req.getParameter("searchTerm") != null) criteria.setSearchTerm(req.getParameter("searchTerm"));
+        
+        if (req.getParameter("page") != null) criteria.setPage(Integer.parseInt(req.getParameter("page")));
+        if (req.getParameter("size") != null) criteria.setSize(Integer.parseInt(req.getParameter("size")));
+        if (req.getParameter("sortBy") != null) criteria.setSortBy(req.getParameter("sortBy"));
+        if (req.getParameter("sortOrder") != null) criteria.setSortOrder(req.getParameter("sortOrder"));
+
+        if (req.getParameter("startDate") != null) criteria.setStartDate(LocalDateTime.parse(req.getParameter("startDate")));
+        if (req.getParameter("endDate") != null) criteria.setEndDate(LocalDateTime.parse(req.getParameter("endDate")));
+
+        List<IncidentDTO> incidents = service.getAllIncidents(criteria);
+        sendResponse(resp, HttpServletResponse.SC_OK, incidents);
+    }
+
+    private void handleGetIncidentById(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String idStr = req.getPathInfo().substring(1);
         int id = Integer.parseInt(idStr);
 
         IncidentDTO incident = service.getIncidentById(id);
 
         if (incident == null) {
-            sendResponse(exchange, 404, "{\"error\":\"Incident not found\"}");
+            sendError(resp, HttpServletResponse.SC_NOT_FOUND, "Incident not found");
             return;
         }
 
-        sendResponse(exchange, 200, incident.toString());
+        sendResponse(resp, HttpServletResponse.SC_OK, incident);
     }
 
-    private void handleCreateIncident(HttpExchange exchange) throws IOException {
-        String body = readRequestBody(exchange.getRequestBody());
-
-        IncidentDTO incident = IncidentDTO.fromJson(body);
-        IncidentDTO created = service.createIncident(incident);
-
-        sendResponse(exchange, 201, created.toString());
+    private void sendResponse(HttpServletResponse resp, int status, Object data) throws IOException {
+        resp.setStatus(status);
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        resp.getWriter().write(gson.toJson(data));
     }
 
-    // ================= UTILS =================
-
-    private String readRequestBody(InputStream is) throws IOException {
-        return new String(is.readAllBytes(), StandardCharsets.UTF_8);
-    }
-
-    private void sendResponse(HttpExchange exchange, int statusCode, String response) throws IOException {
-        exchange.getResponseHeaders().set("Content-Type", "application/json");
-        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
-        exchange.sendResponseHeaders(statusCode, response.getBytes().length);
-        exchange.getResponseBody().write(response.getBytes());
-        exchange.close();
+    private void sendError(HttpServletResponse resp, int status, String message) throws IOException {
+        resp.setStatus(status);
+        resp.setContentType("application/json");
+        resp.getWriter().write("{\"error\":\"" + message + "\"}");
     }
 }

@@ -1,7 +1,7 @@
 package com.company.sigess.controllers;
 
 import com.company.sigess.models.DTO.UserDTO;
-import com.company.sigess.services.UserImp;
+import com.company.sigess.services.UserService;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.util.List;
 public class UserController implements HttpHandler {
 
 
-    private UserImp servicet = new UserImp();
+    private UserService servicet = new UserService();
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();

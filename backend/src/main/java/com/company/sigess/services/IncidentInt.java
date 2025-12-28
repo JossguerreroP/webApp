@@ -1,20 +1,12 @@
 package com.company.sigess.services;
 
+import com.company.sigess.models.DTO.IncidentCriteria;
 import com.company.sigess.models.DTO.IncidentDTO;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface IncidentInt {
-    public List<IncidentDTO> getAllIncidents() {
-        return new ArrayList<>();
-    }
-
-    public IncidentDTO getIncidentById(int id) {
-        return null;
-    }
-
-    public IncidentDTO createIncident(IncidentDTO incident) {
-        return incident;
-    }
+     List<IncidentDTO> getAllIncidents(IncidentCriteria criteria);
+     IncidentDTO getIncidentById(int id);
+     IncidentDTO createIncident(IncidentDTO incident);
 }

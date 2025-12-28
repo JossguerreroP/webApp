@@ -21,9 +21,6 @@ public class IncidentDTO {
 
     private int version;
 
-    // =====================
-    // Constructors
-    // =====================
 
     public IncidentDTO() {
     }
@@ -56,9 +53,6 @@ public class IncidentDTO {
         this.version = version;
     }
 
-    // =====================
-    // Getters & Setters
-    // =====================
 
     public int getId() {
         return id;
@@ -156,9 +150,6 @@ public class IncidentDTO {
         this.version = version;
     }
 
-    // =====================
-    // JSON helper (simple)
-    // =====================
 
     @Override
     public String toString() {

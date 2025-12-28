@@ -19,7 +19,7 @@ public class DBConn {
                     .getResourceAsStream("db/database.properties");
 
             if (input == null) {
-                throw new RuntimeException("❌ db/database.properties not found in classpath");
+                throw new RuntimeException("db/database.properties not found in classpath");
             }
 
             props.load(input);
@@ -30,10 +30,10 @@ public class DBConn {
 
             this.connection = DriverManager.getConnection(url, user, password);
 
-            System.out.println("✅ Database connection established");
+            System.out.println("Database connection established");
 
         } catch (Exception e) {
-            throw new RuntimeException("❌ Error initializing DB connection", e);
+            throw new RuntimeException("Error initializing DB connection", e);
         }
     }
 
