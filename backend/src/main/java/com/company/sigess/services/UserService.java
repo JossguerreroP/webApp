@@ -13,6 +13,6 @@ public class UserService implements UserInt {
     }
     @Override
     public List<UserDTO> getAllUsers() {
-        return repository.ok();
+        return repository.findAll();
     }
 }

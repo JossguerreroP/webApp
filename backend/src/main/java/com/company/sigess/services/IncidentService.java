@@ -4,6 +4,8 @@ import com.company.sigess.models.DTO.IncidentDTO;
 import com.company.sigess.repositories.HistoryDAO;
 import com.company.sigess.repositories.IncidentDAO;
 import com.company.sigess.repositories.UserDAO;
+import com.company.sigess.security.SecurityContext;
+import com.company.sigess.security.UserPrincipal;
 
 
 import java.util.List;
@@ -31,6 +33,14 @@ public class IncidentService implements IncidentInt {
 
     @Override
     public IncidentDTO updateIncident(IncidentDTO incident, int userId) {
+        // Si userId es 0 o -1, intentamos obtenerlo del SecurityContext
+        if (userId <= 0) {
+            UserPrincipal principal = SecurityContext.getUser();
+            if (principal != null) {
+                userId = principal.getUserId().intValue();
+            }
+        }
+
         IncidentDTO existing = this.repository.findById(incident.getId());
         if (existing == null) throw new RuntimeException("Incidente no encontrado");
 
