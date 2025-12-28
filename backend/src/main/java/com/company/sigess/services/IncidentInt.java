@@ -9,4 +9,5 @@ public interface IncidentInt {
      List<IncidentDTO> getAllIncidents(IncidentCriteria criteria);
      IncidentDTO getIncidentById(int id);
      IncidentDTO createIncident(IncidentDTO incident);
+     IncidentDTO updateIncident(IncidentDTO incident, int userId);
 }

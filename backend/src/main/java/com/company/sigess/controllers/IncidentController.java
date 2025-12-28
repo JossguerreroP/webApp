@@ -39,6 +39,7 @@ public class IncidentController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String pathInfo = req.getPathInfo();
+        System.out.println("[DEBUG_LOG] GET pathInfo: " + pathInfo);
 
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
@@ -46,9 +47,10 @@ public class IncidentController extends HttpServlet {
             } else if (pathInfo.matches("/\\d+")) {
                 handleGetIncidentById(req, resp);
             } else {
-                sendError(resp, HttpServletResponse.SC_NOT_FOUND, "Endpoint not found");
+                sendError(resp, HttpServletResponse.SC_NOT_FOUND, "Endpoint not found: " + pathInfo);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
@@ -57,14 +59,39 @@ public class IncidentController extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             IncidentDTO incident = gson.fromJson(req.getReader(), IncidentDTO.class);
-            
-            // Simular usuario autenticado (esto se debería sacar de la sesión/token)
             if (incident.getCreatedBy() == 0) incident.setCreatedBy(1); 
             
             IncidentDTO created = service.createIncident(incident);
             sendResponse(resp, HttpServletResponse.SC_CREATED, created);
         } catch (Exception e) {
             sendError(resp, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String pathInfo = req.getPathInfo();
+        if (pathInfo == null || !pathInfo.matches("/\\d+")) {
+            sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid ID");
+            return;
+        }
+
+        try {
+            int id = Integer.parseInt(pathInfo.substring(1));
+            IncidentDTO incident = gson.fromJson(req.getReader(), IncidentDTO.class);
+            incident.setId(id);
+            
+            // Simular usuario que modifica (Supervisor/Analista)
+            int userId = 1; 
+            if (req.getParameter("userId") != null) {
+                userId = Integer.parseInt(req.getParameter("userId"));
+            }
+
+            IncidentDTO updated = service.updateIncident(incident, userId);
+            sendResponse(resp, HttpServletResponse.SC_OK, updated);
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
@@ -90,13 +117,25 @@ public class IncidentController extends HttpServlet {
     }
 
     private void handleGetIncidentById(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String idStr = req.getPathInfo().substring(1);
-        int id = Integer.parseInt(idStr);
+        String pathInfo = req.getPathInfo();
+        if (pathInfo == null || pathInfo.length() <= 1) {
+            sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Missing ID");
+            return;
+        }
+        
+        String idStr = pathInfo.substring(1);
+        int id;
+        try {
+            id = Integer.parseInt(idStr);
+        } catch (NumberFormatException e) {
+            sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid ID format: " + idStr);
+            return;
+        }
 
         IncidentDTO incident = service.getIncidentById(id);
 
         if (incident == null) {
-            sendError(resp, HttpServletResponse.SC_NOT_FOUND, "Incident not found");
+            sendError(resp, HttpServletResponse.SC_NOT_FOUND, "Incident with ID " + id + " not found");
             return;
         }
 
