@@ -1,5 +1,4 @@
 package com.company.sigess.controllers;
-
 import com.company.sigess.models.DTO.IncidentCriteria;
 import com.company.sigess.models.DTO.IncidentDTO;
 import com.company.sigess.models.DTO.IncidentReportDTO;
@@ -17,12 +16,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
-
 @WebServlet("/api/incidents/*")
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024 * 1, // 1MB
@@ -30,7 +27,6 @@ import java.util.List;
     maxRequestSize = 1024 * 1024 * 15    // 15MB
 )
 public class IncidentController extends HttpServlet {
-
     private final IncidentService service = new IncidentService();
     private final Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDateTime.class, new JsonSerializer<LocalDateTime>() {
@@ -47,13 +43,11 @@ public class IncidentController extends HttpServlet {
             })
             .setPrettyPrinting()
             .create();
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         String pathInfo = req.getPathInfo();
         System.out.println("[DEBUG_LOG] GET pathInfo: " + pathInfo);
-
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
                 handleGetAllIncidents(req, resp);
@@ -71,20 +65,14 @@ public class IncidentController extends HttpServlet {
             sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
-
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("[DEBUG_LOG] doPost started. Method: " + req.getMethod() + " | PathInfo: " + req.getPathInfo() + " | ContentType: " + req.getContentType());
         req.setCharacterEncoding("UTF-8");
         String pathInfo = req.getPathInfo();
-
         if (pathInfo != null && pathInfo.startsWith("/attachment/")) {
-            System.out.println("[DEBUG_LOG] Routing to handleUploadAttachment");
             handleUploadAttachment(req, resp);
             return;
         }
-
-        System.out.println("[DEBUG_LOG] Routing to create incident (JSON)");
         try {
             IncidentDTO incident = gson.fromJson(req.getReader(), IncidentDTO.class);
             IncidentDTO created = service.createIncident(incident);
@@ -93,7 +81,6 @@ public class IncidentController extends HttpServlet {
             sendError(resp, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         }
     }
-
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
@@ -102,17 +89,15 @@ public class IncidentController extends HttpServlet {
             sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid ID");
             return;
         }
-
         try {
             int id = Integer.parseInt(pathInfo.substring(1));
             IncidentDTO incident = gson.fromJson(req.getReader(), IncidentDTO.class);
             incident.setId(id);
-            
-            int userId = -1; 
+
+            int userId = -1;
             if (req.getParameter("userId") != null) {
                 userId = Integer.parseInt(req.getParameter("userId"));
             }
-
             IncidentDTO updated = service.updateIncident(incident, userId);
             sendResponse(resp, HttpServletResponse.SC_OK, updated);
         } catch (Exception e) {
@@ -120,12 +105,10 @@ public class IncidentController extends HttpServlet {
             sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
-
     private void handleGetReports(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         IncidentReportDTO report = service.getIncidentReport();
         sendResponse(resp, HttpServletResponse.SC_OK, report);
     }
-
     private void handleGetAttachments(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String pathInfo = req.getPathInfo();
         String idStr = pathInfo.substring("/attachment/".length());
@@ -137,7 +120,6 @@ public class IncidentController extends HttpServlet {
             sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid incident ID");
         }
     }
-
     private void handleUploadAttachment(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("[DEBUG_LOG] handleUploadAttachment started for " + req.getPathInfo());
         String pathInfo = req.getPathInfo();
@@ -150,33 +132,22 @@ public class IncidentController extends HttpServlet {
             sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid incident ID");
             return;
         }
-
         Part filePart = null;
         try {
-            System.out.println("[DEBUG_LOG] Attempting to get part 'file'");
             filePart = req.getPart("file");
-            if (filePart != null) {
-                String fileName = getFileName(filePart);
-                System.out.println("[DEBUG_LOG] Found part 'file'. Name: " + fileName + " | Size: " + filePart.getSize());
-            } else {
-                System.out.println("[DEBUG_LOG] Part 'file' is null");
-            }
         } catch (Exception e) {
-            System.err.println("[DEBUG_LOG] Critical error getting part 'file': " + e.getMessage());
+            System.err.println("[DEBUG_LOG] Error getting part 'file': " + e.getMessage());
             e.printStackTrace();
-            throw new ServletException("Error processing multipart file", e);
         }
-
         if (filePart == null) {
             System.err.println("[DEBUG_LOG] No file uploaded (filePart is null)");
             sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "No file uploaded");
             return;
         }
-
-        String fileName = getFileName(filePart);
+        String fileName = filePart.getSubmittedFileName();
         String contentType = filePart.getContentType();
         long size = filePart.getSize();
-        
+
         int userId = -1;
         UserPrincipal principal = SecurityContext.getUser();
         if (principal != null) {
@@ -184,49 +155,40 @@ public class IncidentController extends HttpServlet {
         } else {
             System.err.println("[DEBUG_LOG] No principal found in SecurityContext for upload!");
         }
-
         try (InputStream inputStream = filePart.getInputStream()) {
             System.out.println("[DEBUG_LOG] Adding attachment for incident " + incidentId + " by user " + userId);
             AttachmentDTO attachment = service.addAttachment(incidentId, fileName, contentType, size, inputStream, userId);
             sendResponse(resp, HttpServletResponse.SC_CREATED, attachment);
-        } catch (RuntimeException e) {
-            System.err.println("[DEBUG_LOG] Validation or business error in addAttachment: " + e.getMessage());
-            sendError(resp, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
-            System.err.println("[DEBUG_LOG] Unexpected error in service.addAttachment: " + e.getMessage());
+            System.err.println("[DEBUG_LOG] Error in service.addAttachment: " + e.getMessage());
             e.printStackTrace();
-            sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error interno al procesar el adjunto: " + e.getMessage());
+            sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
-
     private void handleGetAllIncidents(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         IncidentCriteria criteria = new IncidentCriteria();
-
         if (req.getParameter("status") != null) criteria.setStatus(req.getParameter("status"));
         if (req.getParameter("level") != null) criteria.setLevel(req.getParameter("level"));
         if (req.getParameter("areaId") != null) criteria.setAreaId(Integer.parseInt(req.getParameter("areaId")));
         if (req.getParameter("responsibleId") != null) criteria.setResponsibleId(Integer.parseInt(req.getParameter("responsibleId")));
         if (req.getParameter("searchTerm") != null) criteria.setSearchTerm(req.getParameter("searchTerm"));
-        
+
         if (req.getParameter("page") != null) criteria.setPage(Integer.parseInt(req.getParameter("page")));
         if (req.getParameter("size") != null) criteria.setSize(Integer.parseInt(req.getParameter("size")));
         if (req.getParameter("sortBy") != null) criteria.setSortBy(req.getParameter("sortBy"));
         if (req.getParameter("sortOrder") != null) criteria.setSortOrder(req.getParameter("sortOrder"));
-
         if (req.getParameter("startDate") != null) criteria.setStartDate(LocalDateTime.parse(req.getParameter("startDate")));
         if (req.getParameter("endDate") != null) criteria.setEndDate(LocalDateTime.parse(req.getParameter("endDate")));
-
         List<IncidentDTO> incidents = service.getAllIncidents(criteria);
         sendResponse(resp, HttpServletResponse.SC_OK, incidents);
     }
-
     private void handleGetIncidentById(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String pathInfo = req.getPathInfo();
         if (pathInfo == null || pathInfo.length() <= 1) {
             sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Missing ID");
             return;
         }
-        
+
         String idStr = pathInfo.substring(1);
         int id;
         try {
@@ -235,44 +197,24 @@ public class IncidentController extends HttpServlet {
             sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid ID format: " + idStr);
             return;
         }
-
         IncidentDTO incident = service.getIncidentById(id);
-
         if (incident == null) {
             sendError(resp, HttpServletResponse.SC_NOT_FOUND, "Incident with ID " + id + " not found");
             return;
         }
-
         sendResponse(resp, HttpServletResponse.SC_OK, incident);
     }
-
-    private String getFileName(Part part) {
-        String contentDisp = part.getHeader("content-disposition");
-        if (contentDisp != null) {
-            for (String content : contentDisp.split(";")) {
-                if (content.trim().startsWith("filename")) {
-                    String fileName = content.substring(content.indexOf("=") + 1).trim().replace("\"", "");
-                    // Handle potential path prefix in some browsers
-                    return fileName.substring(fileName.lastIndexOf("/") + 1).substring(fileName.lastIndexOf("\\") + 1);
-                }
-            }
-        }
-        return "unknown";
-    }
-
     private void sendResponse(HttpServletResponse resp, int status, Object data) throws IOException {
         resp.setStatus(status);
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         resp.getWriter().write(gson.toJson(data));
     }
-
     private void sendError(HttpServletResponse resp, int status, String message) throws IOException {
         resp.setStatus(status);
         resp.setContentType("application/json");
         resp.getWriter().write("{\"error\":\"" + message + "\"}");
     }
-
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String pathInfo = req.getPathInfo();
@@ -280,17 +222,14 @@ public class IncidentController extends HttpServlet {
             sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid ID");
             return;
         }
-
         try {
             int id = Integer.parseInt(pathInfo.substring(1));
-            
-            int userId = -1; 
+
+            int userId = -1;
             if (req.getParameter("userId") != null) {
                 userId = Integer.parseInt(req.getParameter("userId"));
             }
-
             boolean closed = service.deleteIncident(id, userId);
-
             if (closed) {
                 sendResponse(resp, HttpServletResponse.SC_OK, new MessageResponse("Incident closed successfully"));
             } else {
@@ -300,7 +239,6 @@ public class IncidentController extends HttpServlet {
             sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
-
     private static class MessageResponse {
         private final String message;
         public MessageResponse(String message) { this.message = message; }

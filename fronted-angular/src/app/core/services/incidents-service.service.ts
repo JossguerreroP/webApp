@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Incident, IncidentCriteria } from '../models/incident.model';
 import { HistoryDTO } from '../models/history.model';
+import { AttachmentDTO } from '../models/attachment.model';
 
 @Injectable({
   providedIn: 'root'
@@ -83,5 +84,15 @@ export class IncidentsServiceService {
 
   getIncidentHistory(id: number): Observable<HistoryDTO[]> {
     return this.http.get<HistoryDTO[]>(`${this.apiUrl}/history/${id}`);
+  }
+
+  getAttachments(incidentId: number): Observable<AttachmentDTO[]> {
+    return this.http.get<AttachmentDTO[]>(`${this.apiUrl}/attachment/${incidentId}`);
+  }
+
+  uploadAttachment(incidentId: number, file: File): Observable<AttachmentDTO> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<AttachmentDTO>(`${this.apiUrl}/attachment/${incidentId}`, formData);
   }
 }

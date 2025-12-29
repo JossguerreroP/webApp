@@ -134,4 +134,10 @@
       <app-incident-history [incidentId]="historyIncidentId!" (onClose)="closeHistoryModal()"></app-incident-history>
     </div>
   </div>
+
+  <div class="modal-overlay" *ngIf="showAttachmentsModal" (click)="closeAttachmentsModal()">
+    <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+      <app-incident-attachments [incidentId]="attachmentsIncidentId!" (onClose)="closeAttachmentsModal()"></app-incident-attachments>
+    </div>
+  </div>
 </div>

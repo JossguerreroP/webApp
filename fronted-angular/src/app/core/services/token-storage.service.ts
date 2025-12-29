@@ -58,4 +58,18 @@ export class TokenStorageService {
       return null;
     }
   }
+
+  isTokenExpired(): boolean {
+    const token = this.getAccessToken();
+    if (!token) return true;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (!payload.exp) return false;
+      const expirationDate = (payload.exp * 1000) - 60000; // 1 minute buffer
+      return Date.now() > expirationDate;
+    } catch (e) {
+      console.error('Error checking token expiration', e);
+      return true;
+    }
+  }
 }

@@ -3,6 +3,7 @@ import { TokenStorageService } from './token-storage.service';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,11 @@ import { tap } from 'rxjs/operators';
 export class AuthService {
   private apiUrl = 'http://localhost:8080/api/users/login';
 
-  constructor(private tokenStorage: TokenStorageService, private http: HttpClient) { }
+  constructor(
+    private tokenStorage: TokenStorageService,
+    private http: HttpClient,
+    private router: Router
+  ) { }
 
   login(credentials: { username: string; password: string }): Observable<any> {
     return this.http.post<any>(this.apiUrl, credentials).pipe(
@@ -23,12 +28,13 @@ export class AuthService {
   }
 
   async refreshToken(): Promise<void> {
-    // Implement token refresh logic here
-    console.log('Refreshing token...');
+    console.warn('Token refresh not implemented');
+    throw new Error('Token refresh not implemented');
   }
 
   signOut(): void {
+    console.log('[AUTH] Signing out...');
     this.tokenStorage.clearTokens();
-    // Additional sign out logic (e.g., redirect to login)
+    this.router.navigate(['/login']);
   }
 }

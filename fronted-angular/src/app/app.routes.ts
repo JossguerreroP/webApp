@@ -5,7 +5,8 @@ import {ReportIncidentComponent} from './incidents/report-incident/report-incide
 
 export const routes: Routes = [
 
-  { path: '', component: AuthComponent},
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'login', component: AuthComponent },
   { path: 'incidents', component: IncidentsComponent},
   { path: 'report-incident', component: ReportIncidentComponent},
 ];

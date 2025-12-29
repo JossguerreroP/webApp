@@ -1,0 +1,50 @@
+<div class="attachments-modal">
+  <div class="modal-header">
+    <h3>Adjuntos para el Incidente #{{ incidentId }}</h3>
+    <button class="btn-close" (click)="close()">×</button>
+  </div>
+
+  <div class="modal-body">
+    <div class="upload-section">
+      <input type="file" #fileInput (change)="onFileSelected($event)" style="display: none">
+      <button class="btn-primary" (click)="fileInput.click()">Seleccionar Archivo</button>
+      <span *ngIf="selectedFile" class="selected-file-name">{{ selectedFile.name }}</span>
+      <button class="btn-success" [disabled]="!selectedFile || uploading" (click)="uploadFile()">
+        {{ uploading ? 'Subiendo...' : 'Subir Adjunto' }}
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="loading-state">
+      Cargando adjuntos...
+    </div>
+
+    <div *ngIf="!loading && attachments.length === 0" class="empty-state">
+      No hay adjuntos para este incidente.
+    </div>
+
+    <div *ngIf="attachments.length > 0" class="attachments-list">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Nombre del Archivo</th>
+            <th>Tipo</th>
+            <th>Tamaño</th>
+            <th>Fecha de Carga</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let attachment of attachments">
+            <td>{{ attachment.originalFilename }}</td>
+            <td>{{ attachment.mimeType }}</td>
+            <td>{{ (attachment.fileSize / 1024).toFixed(2) }} KB</td>
+            <td>{{ attachment.uploadedAt | date:'short' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn-secondary" (click)="close()">Cerrar</button>
+  </div>
+</div>

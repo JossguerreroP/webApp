@@ -6,11 +6,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CreateIncidentComponent } from './create-incident/create-incident.component';
 import { IncidentHistoryComponent } from './incident-history/incident-history.component';
+import { IncidentAttachmentsComponent } from './incident-attachments/incident-attachments.component';
 
 @Component({
   selector: 'app-incidents',
   standalone: true,
-  imports: [CommonModule, FormsModule, CreateIncidentComponent, IncidentHistoryComponent],
+  imports: [CommonModule, FormsModule, CreateIncidentComponent, IncidentHistoryComponent, IncidentAttachmentsComponent],
   templateUrl: './incidents.component.html',
   styleUrl: './incidents.component.css'
 })
@@ -18,8 +19,10 @@ export class IncidentsComponent implements OnInit {
   incidents: Incident[] = [];
   showModal = false;
   showHistoryModal = false;
+  showAttachmentsModal = false;
   selectedIncident: Incident | null = null;
   historyIncidentId: number | null = null;
+  attachmentsIncidentId: number | null = null;
   criteria: IncidentCriteria = {
     status: '',
     level: '',
@@ -203,6 +206,12 @@ export class IncidentsComponent implements OnInit {
   viewAttachments(id: number | undefined): void {
     if (id === undefined) return;
     console.log('View attachments for incident:', id);
-    // TODO: Implement attachments logic
+    this.attachmentsIncidentId = id;
+    this.showAttachmentsModal = true;
+  }
+
+  closeAttachmentsModal(): void {
+    this.showAttachmentsModal = false;
+    this.attachmentsIncidentId = null;
   }
 }

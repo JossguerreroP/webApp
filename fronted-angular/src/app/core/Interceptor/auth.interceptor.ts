@@ -26,6 +26,12 @@ export const authInterceptor: HttpInterceptorFn = (
 
   const accessToken = tokenStorage.getAccessToken();
 
+  // Verificar si el token ya expiró antes de enviar la petición
+  if (accessToken && tokenStorage.isTokenExpired()) {
+    console.warn('⚠️ [INTERCEPTOR] El token ya ha expirado. Intentando refresh antes de la petición...');
+    // Aquí podríamos intentar un refresh proactivo
+  }
+
   // Log detallado del token para debugging
   if (accessToken) {
     const logData = {
@@ -70,22 +76,26 @@ export const authInterceptor: HttpInterceptorFn = (
   // Log del header final con validaciones adicionales
   if (accessToken) {
     const authHeader = authReq.headers.get('Authorization');
-    console.log('[INTERCEPTOR] Header Authorization final:', authHeader?.substring(0, 50) + '...');
+    // console.log('[INTERCEPTOR] Header Authorization final:', authHeader?.substring(0, 50) + '...');
 
     // Log específico para incidentes con validaciones de formato
-    if (req.url.includes('api/incidents') && req.method === 'GET') {
+    if (req.url.includes('api/incidents')) {
       const bearerPrefix = 'Bearer ';
       const hasCorrectPrefix = authHeader?.startsWith(bearerPrefix);
       const tokenPart = authHeader?.substring(bearerPrefix.length);
 
       console.log('🔍 [INTERCEPTOR-INCIDENTS] Validación del header Authorization:', {
+        method: req.method,
+        url: req.url,
         fullHeader: authHeader,
         hasCorrectPrefix: hasCorrectPrefix,
         headerLength: authHeader?.length,
         tokenPartLength: tokenPart?.length,
         expectedTokenLength: accessToken.length,
         tokenMatches: tokenPart === accessToken.trim(),
-        hasExtraSpaces: authHeader?.includes('  ') // doble espacio
+        hasExtraSpaces: authHeader?.includes('  '), // doble espacio
+        contentType: req.headers.get('Content-Type'),
+        bodyType: req.body instanceof FormData ? 'FormData' : typeof req.body
       });
     }
   }
@@ -93,8 +103,9 @@ export const authInterceptor: HttpInterceptorFn = (
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       // Log específico para errores en incidentes
-      if (req.url.includes('api/incidents') && req.method === 'GET') {
+      if (req.url.includes('api/incidents')) {
         console.error('🚨 [INTERCEPTOR-INCIDENTS] Error en petición:', {
+          method: req.method,
           status: error.status,
           statusText: error.statusText,
           message: error.message,
@@ -107,8 +118,13 @@ export const authInterceptor: HttpInterceptorFn = (
       }
 
       if (error.status === 401) {
+        // Solo cerrar sesión si realmente hay un error de refresh o si no hay token de refresh
+        // Pero por ahora, vamos a registrar más info para ver por qué sucede
+        console.warn('⚠️ [INTERCEPTOR] 401 Detectado. Intentando refresh o cerrando sesión...');
         return handle401Error(authReq, next, authService, tokenStorage);
       }
+
+      // NO llamar a signOut si no es 401, a menos que sea un error específico que lo requiera
 
       // Global error handling for other statuses
       console.error(`[INTERCEPTOR] Global Error [${error.status}]:`, error.message);
@@ -147,20 +163,42 @@ function handle401Error(
 ): Observable<HttpEvent<unknown>> {
   const refreshToken = tokenStorage.getRefreshToken();
 
+  // Si no hay refresh token, verificamos si es una petición que debería haber tenido token
+  // Si no tenía token y devolvió 401, es normal (aunque no debería pasar si el interceptor funciona)
+  // Pero si tenía un token que ya no sirve, intentamos refresh o cerramos sesión.
+
   if (!refreshToken) {
-    authService.signOut();
-    return throwError(() => new Error('Session expired'));
+    const hadToken = req.headers.has('Authorization');
+    const isUpload = req.body instanceof FormData || req.url.includes('/attachment/');
+
+    if (hadToken) {
+      if (isUpload) {
+         console.error('❌ [INTERCEPTOR] Error 401 en Upload. No cerraremos sesión automáticamente para permitir diagnóstico.');
+         return throwError(() => new Error('Upload unauthorized (401)'));
+      }
+      console.error('❌ [INTERCEPTOR] Token expirado y no hay refresh token disponible. Cerrando sesión.');
+      authService.signOut();
+      return throwError(() => new Error('Session expired'));
+    } else {
+      // Si ni siquiera tenía token, redirigir a login sin limpiar nada extra
+      console.warn('⚠️ [INTERCEPTOR] Petición sin token devolvió 401. Redirigiendo a login.');
+      authService.signOut();
+      return throwError(() => new Error('Unauthorized'));
+    }
   }
 
+  console.log('[INTERCEPTOR] Intentando refrescar token...');
   return from(authService.refreshToken()).pipe(
     switchMap(() => {
       const newToken = tokenStorage.getAccessToken();
+      console.log('[INTERCEPTOR] Token refrescado. Reintentando petición...');
       const newReq = req.clone({
         headers: req.headers.set('Authorization', `Bearer ${newToken}`)
       });
       return next(newReq);
     }),
     catchError((error) => {
+      console.error('❌ [INTERCEPTOR] Error al refrescar token o en reintento. Cerrando sesión.', error);
       authService.signOut();
       return throwError(() => error);
     })

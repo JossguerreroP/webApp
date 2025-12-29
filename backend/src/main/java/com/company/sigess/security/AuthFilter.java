@@ -43,7 +43,7 @@ public class AuthFilter implements Filter {
         String authHeader = httpRequest.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
+            String token = authHeader.substring(7).trim();
             try {
                 Claims claims = JwtUtil.validateToken(token);
                 Long userId = Long.parseLong(claims.getSubject());
@@ -54,16 +54,31 @@ public class AuthFilter implements Filter {
 
                 try {
                     chain.doFilter(request, response);
+                } catch (Exception e) {
+                    System.err.println("[DEBUG_LOG] Exception during chain.doFilter for path " + path);
+                    e.printStackTrace();
+                    throw e; // Relanzar para que no sea capturada como error de token
                 } finally {
                     SecurityContext.clear();
                 }
-            } catch (Exception e) {
+            } catch (io.jsonwebtoken.JwtException | IllegalArgumentException e) {
+                System.err.println("[DEBUG_LOG] Token validation failed for path " + path + ": " + e.getMessage());
+                if (token.length() > 0) {
+                     System.err.println("[DEBUG_LOG] Token starts with: " + token.substring(0, Math.min(token.length(), 15)));
+                }
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                httpResponse.getWriter().write("Invalid or expired token");
+                httpResponse.getWriter().write("Invalid or expired token: " + e.getMessage());
+            } catch (Exception e) {
+                // Capturar otras excepciones que no sean de JWT pero que ocurrieron ANTES de doFilter
+                System.err.println("[DEBUG_LOG] Unexpected error in AuthFilter for path " + path);
+                e.printStackTrace();
+                httpResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                httpResponse.getWriter().write("Internal server error: " + e.getMessage());
             }
         } else {
+            System.err.println("[DEBUG_LOG] Authorization header problem. Header: " + (authHeader == null ? "NULL" : "present but invalid") + " | Path: " + path);
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            httpResponse.getWriter().write("Authorization header missing");
+            httpResponse.getWriter().write("Authorization header missing or invalid");
         }
     }
 
