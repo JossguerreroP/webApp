@@ -34,7 +34,7 @@
             <td>{{ item.fieldName }}</td>
             <td class="value-cell">{{ item.oldValue || '-' }}</td>
             <td class="value-cell">{{ item.newValue }}</td>
-            <td>Usuario #{{ item.changedBy }}</td>
+            <td>{{ item.changedByName || ('Usuario #' + item.changedBy) }}</td>
           </tr>
         </tbody>
       </table>

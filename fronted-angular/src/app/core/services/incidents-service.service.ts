@@ -65,13 +65,19 @@ export class IncidentsServiceService {
     return this.http.post<Incident>(this.apiUrl, incident);
   }
 
-  updateIncident(id: number, incident: Incident, userId: number = 1): Observable<Incident> {
-    let params = new HttpParams().set('userId', userId.toString());
+  updateIncident(id: number, incident: Incident, userId?: number): Observable<Incident> {
+    let params = new HttpParams();
+    if (userId) {
+      params = params.set('userId', userId.toString());
+    }
     return this.http.put<Incident>(`${this.apiUrl}/${id}`, incident, { params });
   }
 
-  deleteIncident(id: number, userId: number = 1): Observable<any> {
-    let params = new HttpParams().set('userId', userId.toString());
+  deleteIncident(id: number, userId?: number): Observable<any> {
+    let params = new HttpParams();
+    if (userId) {
+      params = params.set('userId', userId.toString());
+    }
     return this.http.delete<any>(`${this.apiUrl}/${id}`, { params });
   }
 

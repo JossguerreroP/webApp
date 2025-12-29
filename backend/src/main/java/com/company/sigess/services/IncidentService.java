@@ -41,7 +41,7 @@ public class IncidentService implements IncidentInt {
                 userId = principal.getUserId().intValue();
             }
         }
-
+        
         IncidentDTO existing = this.repository.findById(incident.getId());
         if (existing == null) throw new RuntimeException("Incidente no encontrado");
 
@@ -103,6 +103,14 @@ public class IncidentService implements IncidentInt {
 
     @Override
     public IncidentDTO createIncident(IncidentDTO incident) {
+        // Si createdBy no está establecido, intentamos obtenerlo del SecurityContext
+        if (incident.getCreatedBy() <= 0) {
+            UserPrincipal principal = SecurityContext.getUser();
+            if (principal != null) {
+                incident.setCreatedBy(principal.getUserId().intValue());
+            }
+        }
+        
         if (incident.getStatus() == null) {
             incident.setStatus("abierto");
         }

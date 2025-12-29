@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { IncidentsServiceService } from '../core/services/incidents-service.service';
+import { TokenStorageService } from '../core/services/token-storage.service';
 import { Incident, IncidentCriteria } from '../core/models/incident.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -42,7 +43,10 @@ export class IncidentsComponent implements OnInit {
     'critico': 'Crítico'
   };
 
-  constructor(private incidentService: IncidentsServiceService) {}
+  constructor(
+    private incidentService: IncidentsServiceService,
+    private tokenStorage: TokenStorageService
+  ) {}
 
   ngOnInit(): void {
     this.loadIncidents();
@@ -167,7 +171,8 @@ export class IncidentsComponent implements OnInit {
   deleteIncident(id: number | undefined): void {
     if (id === undefined) return;
     if (confirm('¿Está seguro de que desea eliminar este incidente?')) {
-      this.incidentService.deleteIncident(id).subscribe({
+      const userId = this.tokenStorage.getUserId();
+      this.incidentService.deleteIncident(id, userId || undefined).subscribe({
         next: () => {
           this.loadIncidents();
         },

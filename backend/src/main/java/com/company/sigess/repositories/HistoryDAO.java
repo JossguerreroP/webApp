@@ -40,10 +40,11 @@ public class HistoryDAO {
 
     public List<HistoryDTO> getHistoryByIncidentId(int incidentId) {
         List<HistoryDTO> history = new ArrayList<>();
-        String sql = "SELECT id, incident_id, changed_by, field_name, old_value, new_value, changed_at " +
-                     "FROM incident_history " +
-                     "WHERE incident_id = ? " +
-                     "ORDER BY changed_at DESC";
+        String sql = "SELECT h.id, h.incident_id, h.changed_by, u.username as changed_by_name, h.field_name, h.old_value, h.new_value, h.changed_at " +
+                     "FROM incident_history h " +
+                     "LEFT JOIN users u ON h.changed_by = u.id " +
+                     "WHERE h.incident_id = ? " +
+                     "ORDER BY h.changed_at DESC";
 
         try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
             stmt.setInt(1, incidentId);
@@ -53,6 +54,7 @@ public class HistoryDAO {
                     dto.setId(rs.getInt("id"));
                     dto.setIncidentId(rs.getInt("incident_id"));
                     dto.setChangedBy(rs.getInt("changed_by"));
+                    dto.setChangedByName(rs.getString("changed_by_name"));
                     dto.setFieldName(rs.getString("field_name"));
                     dto.setOldValue(rs.getString("old_value"));
                     dto.setNewValue(rs.getString("new_value"));

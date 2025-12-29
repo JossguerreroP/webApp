@@ -6,6 +6,7 @@ public class HistoryDTO {
     private int id;
     private int incidentId;
     private int changedBy;
+    private String changedByName;
     private String fieldName;
     private String oldValue;
     private String newValue;
@@ -36,6 +37,14 @@ public class HistoryDTO {
 
     public void setChangedBy(int changedBy) {
         this.changedBy = changedBy;
+    }
+
+    public String getChangedByName() {
+        return changedByName;
+    }
+
+    public void setChangedByName(String changedByName) {
+        this.changedByName = changedByName;
     }
 
     public String getFieldName() {

@@ -1,0 +1,24 @@
+<nav class="navbar">
+  <div class="navbar-brand">
+    <span class="logo">SIGESS</span>
+  </div>
+  <div class="navbar-user">
+    <div class="dropdown">
+      <button class="dropdown-toggle" (click)="toggleDropdown()">
+
+        <i class="fas fa-chevron-down"></i>
+      </button>
+      <div class="dropdown-menu" [class.show]="isDropdownOpen">
+        <div class="dropdown-item user-info" *ngIf="userData">
+          <p><strong>USER ID:</strong> {{ userData.sub || userData.username }}</p>
+          <p *ngIf="userData.email"><strong>Email:</strong> {{ userData.email }}</p>
+          <p *ngIf="userData.role"><strong>Role:</strong> {{ userData.role }}</p>
+        </div>
+        <hr *ngIf="userData">
+        <button class="dropdown-item sign-out" (click)="signOut()">
+          <i class="fas fa-sign-out-alt"></i> Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>

@@ -61,8 +61,6 @@ public class IncidentController extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         try {
             IncidentDTO incident = gson.fromJson(req.getReader(), IncidentDTO.class);
-            if (incident.getCreatedBy() == 0) incident.setCreatedBy(1); 
-            
             IncidentDTO created = service.createIncident(incident);
             sendResponse(resp, HttpServletResponse.SC_CREATED, created);
         } catch (Exception e) {
@@ -84,8 +82,7 @@ public class IncidentController extends HttpServlet {
             IncidentDTO incident = gson.fromJson(req.getReader(), IncidentDTO.class);
             incident.setId(id);
             
-            // Simular usuario que modifica (Supervisor/Analista)
-            int userId = 1; 
+            int userId = -1; 
             if (req.getParameter("userId") != null) {
                 userId = Integer.parseInt(req.getParameter("userId"));
             }
@@ -169,8 +166,7 @@ public class IncidentController extends HttpServlet {
         try {
             int id = Integer.parseInt(pathInfo.substring(1));
             
-            // Simular usuario que modifica
-            int userId = 1; 
+            int userId = -1; 
             if (req.getParameter("userId") != null) {
                 userId = Integer.parseInt(req.getParameter("userId"));
             }

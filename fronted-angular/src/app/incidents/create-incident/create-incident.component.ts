@@ -81,7 +81,8 @@ export class CreateIncidentComponent implements OnInit {
 
       if (this.incident && this.incident.id) {
         // Edit mode
-        this.incidentService.updateIncident(this.incident.id, incidentData).subscribe({
+        const userId = this.tokenStorage.getUserId();
+        this.incidentService.updateIncident(this.incident.id, incidentData, userId || undefined).subscribe({
           next: () => {
             this.isSubmitting = false;
             this.close();
