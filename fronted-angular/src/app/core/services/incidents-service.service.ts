@@ -69,7 +69,8 @@ export class IncidentsServiceService {
     return this.http.put<Incident>(`${this.apiUrl}/${id}`, incident, { params });
   }
 
-  deleteIncident(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  deleteIncident(id: number, userId: number = 1): Observable<any> {
+    let params = new HttpParams().set('userId', userId.toString());
+    return this.http.delete<any>(`${this.apiUrl}/${id}`, { params });
   }
 }

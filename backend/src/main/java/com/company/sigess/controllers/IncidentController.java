@@ -178,13 +178,17 @@ public class IncidentController extends HttpServlet {
             boolean closed = service.deleteIncident(id, userId);
 
             if (closed) {
-                resp.setStatus(HttpServletResponse.SC_OK);
-                resp.getWriter().write("{\"message\":\"Incident closed successfully\"}");
+                sendResponse(resp, HttpServletResponse.SC_OK, new MessageResponse("Incident closed successfully"));
             } else {
                 sendError(resp, HttpServletResponse.SC_NOT_FOUND, "Incident not found");
             }
         } catch (Exception e) {
             sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
+    }
+
+    private static class MessageResponse {
+        private final String message;
+        public MessageResponse(String message) { this.message = message; }
     }
 }

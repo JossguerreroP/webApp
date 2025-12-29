@@ -164,8 +164,15 @@ export class IncidentsComponent implements OnInit {
   deleteIncident(id: number | undefined): void {
     if (id === undefined) return;
     if (confirm('¿Está seguro de que desea eliminar este incidente?')) {
-      console.log('Delete incident:', id);
-      // TODO: Implement delete logic
+      this.incidentService.deleteIncident(id).subscribe({
+        next: () => {
+          this.loadIncidents();
+        },
+        error: (err) => {
+          console.error('Error deleting incident:', err);
+          alert('No se pudo eliminar el incidente.');
+        }
+      });
     }
   }
 
