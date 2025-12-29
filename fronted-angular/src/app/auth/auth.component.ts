@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import {FormsModule} from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {AuthServiceService} from '../core/services/auth-service.service';
+
 @Component({
   selector: 'app-auth',
   standalone: true,

@@ -41,25 +41,37 @@ public class UserController extends HttpServlet {
 
     private void handleLogin(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            UserDTO loginRequest = gson.fromJson(req.getReader(), UserDTO.class);
-            // In a real app, you would verify credentials here.
-            // For this implementation, we'll assume the user exists if they send a valid JSON.
-            // Let's try to find the user by ID or Name if possible, or just mock it for demonstration.
+            // Define a simple DTO structure for the login request internally
+            // or use a Map to read username and password
+            java.util.Map<String, String> credentials = gson.fromJson(req.getReader(), java.util.Map.class);
+            String username = credentials.get("username");
+            String password = credentials.get("password");
+
+            if (username == null || password == null) {
+                sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Username and password are required");
+                return;
+            }
             
+            // In a real app, you would verify the password (e.g., using BCrypt)
+            // For now, we find the user by name (username) and check if credentials match our records
             UserDTO user = userService.getAllUsers().stream()
-                    .filter(u -> u.name().equalsIgnoreCase(loginRequest.name()))
+                    .filter(u -> u.name().equalsIgnoreCase(username))
                     .findFirst()
                     .orElse(null);
 
-            if (user != null) {
+            // Simple mock password check: password must match username + "123" 
+            // to match your database data (analista123, supervisor123)
+            boolean isAuthenticated = user != null && password.equals(username + "123");
+
+            if (isAuthenticated) {
                 String token = JwtUtil.generateToken(user);
                 resp.setContentType("application/json");
                 resp.getWriter().write("{\"token\":\"" + token + "\"}");
             } else {
-                sendError(resp, HttpServletResponse.SC_UNAUTHORIZED, "Invalid credentials");
+                sendError(resp, HttpServletResponse.SC_UNAUTHORIZED, "Invalid username or password");
             }
         } catch (Exception e) {
-            sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid request");
+            sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid request format");
         }
     }
 
