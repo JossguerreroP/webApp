@@ -1,1 +1,45 @@
-<p>incidents works!</p>
+<div class="incidents-container">
+  <div class="header-section">
+    <h2 class="title">Lista de Incidentes</h2>
+  </div>
+
+  <div class="table-card">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Título</th>
+          <th>Descripción</th>
+          <th>Tipo</th>
+          <th>Nivel</th>
+          <th>Estado</th>
+          <th>ID Responsable</th>
+          <th>ID Área</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let incident of incidents">
+          <td>#{{ incident.id }}</td>
+          <td><strong>{{ incident.title }}</strong></td>
+          <td>{{ incident.description }}</td>
+          <td>{{ incident.type }}</td>
+          <td>
+            <span class="badge" [ngClass]="getLevelClass(incident.level)">
+              {{ translateLevel(incident.level) }}
+            </span>
+          </td>
+          <td>
+            <span class="badge" [ngClass]="getStatusClass(incident.status)">
+              {{ translateStatus(incident.status) }}
+            </span>
+          </td>
+          <td>{{ incident.responsibleId }}</td>
+          <td>{{ incident.areaId }}</td>
+        </tr>
+        <tr *ngIf="incidents.length === 0">
+          <td colspan="8" class="text-center empty-state">No se encontraron incidentes.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
