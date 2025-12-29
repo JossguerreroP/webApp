@@ -1,1 +1,51 @@
-<p>report-incident works!</p>
+<div class="report-container">
+  <h2>Reporte de Incidentes</h2>
+
+  <div *ngIf="loading" class="loading">
+    Cargando reporte...
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error && report" class="report-content">
+
+    <div class="report-section">
+      <h3>Top Áreas con más Incidentes</h3>
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Área</th>
+            <th>Cantidad de Incidentes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let area of report.topAreas">
+            <td>{{ area.areaName }}</td>
+            <td>{{ area.incidentCount }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="report-section">
+      <h3>Semanas Críticas (Inicio de Semana)</h3>
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Inicio de Semana</th>
+            <th>Cantidad de Incidentes Críticos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let week of report.criticalWeekly">
+            <td>{{ week.week }}</td>
+            <td>{{ week.incidentCount }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>

@@ -2,6 +2,7 @@ package com.company.sigess.controllers;
 
 import com.company.sigess.models.DTO.IncidentCriteria;
 import com.company.sigess.models.DTO.IncidentDTO;
+import com.company.sigess.models.DTO.IncidentReportDTO;
 import com.company.sigess.services.IncidentService;
 import com.google.gson.*;
 import java.lang.reflect.Type;
@@ -45,6 +46,8 @@ public class IncidentController extends HttpServlet {
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
                 handleGetAllIncidents(req, resp);
+            } else if (pathInfo.equals("/reports")) {
+                handleGetReports(req, resp);
             } else if (pathInfo.matches("/\\d+")) {
                 handleGetIncidentById(req, resp);
             } else {
@@ -93,6 +96,11 @@ public class IncidentController extends HttpServlet {
             e.printStackTrace();
             sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
+    }
+
+    private void handleGetReports(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        IncidentReportDTO report = service.getIncidentReport();
+        sendResponse(resp, HttpServletResponse.SC_OK, report);
     }
 
     private void handleGetAllIncidents(HttpServletRequest req, HttpServletResponse resp) throws IOException {

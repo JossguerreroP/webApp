@@ -2,6 +2,7 @@ package com.company.sigess.services;
 import com.company.sigess.models.DTO.HistoryDTO;
 import com.company.sigess.models.DTO.IncidentCriteria;
 import com.company.sigess.models.DTO.IncidentDTO;
+import com.company.sigess.models.DTO.IncidentReportDTO;
 import com.company.sigess.repositories.HistoryDAO;
 import com.company.sigess.repositories.IncidentDAO;
 import com.company.sigess.repositories.UserDAO;
@@ -132,5 +133,13 @@ public class IncidentService implements IncidentInt {
     @Override
     public List<HistoryDTO> getIncidentHistory(int incidentId) {
         return historyRepository.getHistoryByIncidentId(incidentId);
+    }
+
+    @Override
+    public IncidentReportDTO getIncidentReport() {
+        return new IncidentReportDTO(
+            repository.getTopAreasWithMostIncidents(),
+            repository.getCriticalIncidentsByWeek()
+        );
     }
 }

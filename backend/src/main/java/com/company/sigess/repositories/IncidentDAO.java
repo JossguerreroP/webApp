@@ -213,4 +213,54 @@ public class IncidentDAO {
             throw new RuntimeException("Error al actualizar incidente", e);
         }
     }
+
+    public List<com.company.sigess.models.DTO.AreaIncidentCountDTO> getTopAreasWithMostIncidents() {
+        List<com.company.sigess.models.DTO.AreaIncidentCountDTO> result = new ArrayList<>();
+        String sql = "SELECT a.name as area_name, COUNT(i.id) as incident_count " +
+                     "FROM incidents i " +
+                     "JOIN areas a ON i.area_id = a.id " +
+                     "WHERE i.created_at >= NOW() - INTERVAL '3 months' " +
+                     "GROUP BY a.name " +
+                     "ORDER BY incident_count DESC " +
+                     "LIMIT 3";
+
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                result.add(new com.company.sigess.models.DTO.AreaIncidentCountDTO(
+                    rs.getString("area_name"),
+                    rs.getInt("incident_count")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error al obtener top áreas", e);
+        }
+        return result;
+    }
+
+    public List<com.company.sigess.models.DTO.WeeklyIncidentCountDTO> getCriticalIncidentsByWeek() {
+        List<com.company.sigess.models.DTO.WeeklyIncidentCountDTO> result = new ArrayList<>();
+        // Asumiendo PostgreSQL por el uso de ILIKE y NOW() en el código existente
+        // Cambiamos 'YYYY-WW' por el formato 'YYYY-MM-DD' de la fecha de inicio de la semana para mayor claridad
+        String sql = "SELECT TO_CHAR(DATE_TRUNC('week', created_at), 'YYYY-MM-DD') as week_label, COUNT(id) as incident_count " +
+                     "FROM incidents " +
+                     "WHERE level = 'alto' AND created_at >= NOW() - INTERVAL '8 weeks' " +
+                     "GROUP BY week_label " +
+                     "ORDER BY week_label DESC";
+
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                result.add(new com.company.sigess.models.DTO.WeeklyIncidentCountDTO(
+                    rs.getString("week_label"),
+                    rs.getInt("incident_count")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error al obtener incidentes críticos por semana", e);
+        }
+        return result;
+    }
 }
