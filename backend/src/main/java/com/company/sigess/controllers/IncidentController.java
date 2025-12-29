@@ -168,10 +168,18 @@ public class IncidentController extends HttpServlet {
 
         try {
             int id = Integer.parseInt(pathInfo.substring(1));
-            boolean deleted = service.deleteIncident(id);
+            
+            // Simular usuario que modifica
+            int userId = 1; 
+            if (req.getParameter("userId") != null) {
+                userId = Integer.parseInt(req.getParameter("userId"));
+            }
 
-            if (deleted) {
-                resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            boolean closed = service.deleteIncident(id, userId);
+
+            if (closed) {
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.getWriter().write("{\"message\":\"Incident closed successfully\"}");
             } else {
                 sendError(resp, HttpServletResponse.SC_NOT_FOUND, "Incident not found");
             }

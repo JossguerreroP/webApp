@@ -71,12 +71,27 @@ public class IncidentService implements IncidentInt {
     }
 
     @Override
-    public boolean deleteIncident(int id) {
+    public boolean deleteIncident(int id, int userId) {
         IncidentDTO existing = this.repository.findById(id);
         if (existing == null) {
             throw new RuntimeException("Incidente no encontrado");
         }
-        return this.repository.delete(id);
+
+        // Si userId es <= 0, intentamos obtenerlo del SecurityContext
+        if (userId <= 0) {
+            UserPrincipal principal = SecurityContext.getUser();
+            if (principal != null) {
+                userId = principal.getUserId().intValue();
+            }
+        }
+
+        String oldStatus = existing.getStatus();
+        existing.setStatus("cerrado");
+
+        // Registrar el cambio de estado en el historial
+        checkAndLogChange(id, userId, "status", oldStatus, "cerrado");
+
+        return this.repository.update(existing) != null;
     }
 
     private void checkAndLogChange(int incidentId, int userId, String field, String oldVal, String newVal) {

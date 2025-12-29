@@ -15,6 +15,7 @@ import { CreateIncidentComponent } from './create-incident/create-incident.compo
 export class IncidentsComponent implements OnInit {
   incidents: Incident[] = [];
   showModal = false;
+  selectedIncident: Incident | null = null;
   criteria: IncidentCriteria = {
     status: '',
     level: '',
@@ -74,11 +75,13 @@ export class IncidentsComponent implements OnInit {
   }
 
   openCreateModal(): void {
+    this.selectedIncident = null;
     this.showModal = true;
   }
 
   closeCreateModal(): void {
     this.showModal = false;
+    this.selectedIncident = null;
     this.loadIncidents();
   }
 
@@ -154,7 +157,8 @@ export class IncidentsComponent implements OnInit {
 
   editIncident(incident: Incident): void {
     console.log('Edit incident:', incident);
-    // TODO: Implement edit logic
+    this.selectedIncident = incident;
+    this.showModal = true;
   }
 
   deleteIncident(id: number | undefined): void {

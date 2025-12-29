@@ -1,5 +1,5 @@
 <div class="create-incident-header">
-  <h3>Crear Nuevo Incidente</h3>
+  <h3>{{ incident ? 'Editar Incidente' : 'Crear Nuevo Incidente' }}</h3>
   <button class="btn-close" (click)="close()">&times;</button>
 </div>
 <div class="create-incident-body">
@@ -69,7 +69,7 @@
     <div class="form-actions">
       <button type="button" (click)="close()" class="btn-secondary" [disabled]="isSubmitting">Cancelar</button>
       <button type="submit" class="btn-primary" [disabled]="incidentForm.invalid || isSubmitting">
-        {{ isSubmitting ? 'Guardando...' : 'Crear Incidente' }}
+        {{ isSubmitting ? 'Guardando...' : (incident ? 'Actualizar Incidente' : 'Crear Incidente') }}
       </button>
     </div>
   </form>

@@ -10,5 +10,5 @@ public interface IncidentInt {
      IncidentDTO getIncidentById(int id);
      IncidentDTO createIncident(IncidentDTO incident);
      IncidentDTO updateIncident(IncidentDTO incident, int userId);
-     boolean deleteIncident(int id);
+     boolean deleteIncident(int id, int userId);
 }

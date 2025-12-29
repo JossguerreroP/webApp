@@ -1,7 +1,8 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IncidentsServiceService } from '../../core/services/incidents-service.service';
+import { Incident } from '../../core/models/incident.model';
 
 @Component({
   selector: 'app-create-incident',
@@ -11,6 +12,7 @@ import { IncidentsServiceService } from '../../core/services/incidents-service.s
   styleUrl: './create-incident.component.css'
 })
 export class CreateIncidentComponent implements OnInit {
+  @Input() incident?: Incident | null;
   @Output() onClose = new EventEmitter<void>();
   incidentForm: FormGroup;
   isSubmitting = false;
@@ -44,22 +46,56 @@ export class CreateIncidentComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (this.incident) {
+      this.incidentForm.patchValue({
+        title: this.incident.title,
+        description: this.incident.description,
+        type: this.incident.type,
+        level: this.incident.level,
+        status: this.incident.status,
+        responsibleId: this.incident.responsibleId,
+        areaId: this.incident.areaId
+      });
+    }
+  }
 
   onSubmit(): void {
     if (this.incidentForm.valid) {
       this.isSubmitting = true;
-      this.incidentService.createIncident(this.incidentForm.value).subscribe({
-        next: () => {
-          this.isSubmitting = false;
-          this.close();
-        },
-        error: (err) => {
-          this.isSubmitting = false;
-          console.error('Error creating incident:', err);
-          alert('Error al crear el incidente. Por favor, intente de nuevo.');
-        }
-      });
+
+      const incidentData = {
+        ...this.incidentForm.value,
+        version: this.incident?.version
+      };
+
+      if (this.incident && this.incident.id) {
+        // Edit mode
+        this.incidentService.updateIncident(this.incident.id, incidentData).subscribe({
+          next: () => {
+            this.isSubmitting = false;
+            this.close();
+          },
+          error: (err) => {
+            this.isSubmitting = false;
+            console.error('Error updating incident:', err);
+            alert('Error al actualizar el incidente. Por favor, intente de nuevo.');
+          }
+        });
+      } else {
+        // Create mode
+        this.incidentService.createIncident(incidentData).subscribe({
+          next: () => {
+            this.isSubmitting = false;
+            this.close();
+          },
+          error: (err) => {
+            this.isSubmitting = false;
+            console.error('Error creating incident:', err);
+            alert('Error al crear el incidente. Por favor, intente de nuevo.');
+          }
+        });
+      }
     } else {
       this.markFormGroupTouched(this.incidentForm);
     }
