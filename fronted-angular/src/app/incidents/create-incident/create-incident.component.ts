@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IncidentsServiceService } from '../../core/services/incidents-service.service';
+import { TokenStorageService } from '../../core/services/token-storage.service';
 import { Incident } from '../../core/models/incident.model';
 
 @Component({
@@ -33,7 +34,8 @@ export class CreateIncidentComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private incidentService: IncidentsServiceService
+    private incidentService: IncidentsServiceService,
+    private tokenStorage: TokenStorageService
   ) {
     this.incidentForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(5)]],
@@ -41,7 +43,7 @@ export class CreateIncidentComponent implements OnInit {
       type: ['', Validators.required],
       level: ['bajo', Validators.required],
       status: ['abierto', Validators.required],
-      responsibleId: [null, [Validators.required, Validators.min(1)]],
+      responsibleId: [null, [Validators.min(1)]],
       areaId: [null, [Validators.required, Validators.min(1)]]
     });
   }
@@ -68,6 +70,14 @@ export class CreateIncidentComponent implements OnInit {
         ...this.incidentForm.value,
         version: this.incident?.version
       };
+
+      if (!this.incident) {
+        // Automatically set responsibleId for new incidents
+        const userId = this.tokenStorage.getUserId();
+        if (userId) {
+          incidentData.responsibleId = userId;
+        }
+      }
 
       if (this.incident && this.incident.id) {
         // Edit mode

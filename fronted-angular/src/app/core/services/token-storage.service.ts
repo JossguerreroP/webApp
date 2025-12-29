@@ -34,4 +34,16 @@ export class TokenStorageService {
     localStorage.removeItem(this.ACCESS_TOKEN_KEY);
     localStorage.removeItem(this.REFRESH_TOKEN_KEY);
   }
+
+  getUserId(): number | null {
+    const token = this.getAccessToken();
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.userId || payload.sub || null;
+    } catch (e) {
+      console.error('Error decoding token', e);
+      return null;
+    }
+  }
 }

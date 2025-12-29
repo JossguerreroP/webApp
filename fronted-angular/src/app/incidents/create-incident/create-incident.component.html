@@ -46,15 +46,6 @@
           <option *ngFor="let status of statusMap" [value]="status.key">{{ status.value }}</option>
         </select>
       </div>
-
-      <div class="form-group">
-        <label for="responsibleId">ID Responsable</label>
-        <input id="responsibleId" type="number" formControlName="responsibleId" class="form-input">
-        <div *ngIf="incidentForm.get('responsibleId')?.touched && incidentForm.get('responsibleId')?.invalid" class="error-message">
-          <small *ngIf="incidentForm.get('responsibleId')?.errors?.['required']">ID requerido.</small>
-          <small *ngIf="incidentForm.get('responsibleId')?.errors?.['min']">Mínimo 1.</small>
-        </div>
-      </div>
     </div>
 
     <div class="form-group">
