@@ -209,6 +209,10 @@
   position: relative;
 }
 
+.modal-content.modal-large {
+  max-width: 900px;
+}
+
 /* Pagination */
 .pagination {
   display: flex;

@@ -4,18 +4,21 @@ import { Incident, IncidentCriteria } from '../core/models/incident.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CreateIncidentComponent } from './create-incident/create-incident.component';
+import { IncidentHistoryComponent } from './incident-history/incident-history.component';
 
 @Component({
   selector: 'app-incidents',
   standalone: true,
-  imports: [CommonModule, FormsModule, CreateIncidentComponent],
+  imports: [CommonModule, FormsModule, CreateIncidentComponent, IncidentHistoryComponent],
   templateUrl: './incidents.component.html',
   styleUrl: './incidents.component.css'
 })
 export class IncidentsComponent implements OnInit {
   incidents: Incident[] = [];
   showModal = false;
+  showHistoryModal = false;
   selectedIncident: Incident | null = null;
+  historyIncidentId: number | null = null;
   criteria: IncidentCriteria = {
     status: '',
     level: '',
@@ -179,7 +182,13 @@ export class IncidentsComponent implements OnInit {
   viewHistory(id: number | undefined): void {
     if (id === undefined) return;
     console.log('View history for incident:', id);
-    // TODO: Implement history logic
+    this.historyIncidentId = id;
+    this.showHistoryModal = true;
+  }
+
+  closeHistoryModal(): void {
+    this.showHistoryModal = false;
+    this.historyIncidentId = null;
   }
 
   viewAttachments(id: number | undefined): void {

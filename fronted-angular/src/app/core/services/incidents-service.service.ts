@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Incident, IncidentCriteria } from '../models/incident.model';
+import { HistoryDTO } from '../models/history.model';
 
 @Injectable({
   providedIn: 'root'
@@ -72,5 +73,9 @@ export class IncidentsServiceService {
   deleteIncident(id: number, userId: number = 1): Observable<any> {
     let params = new HttpParams().set('userId', userId.toString());
     return this.http.delete<any>(`${this.apiUrl}/${id}`, { params });
+  }
+
+  getIncidentHistory(id: number): Observable<HistoryDTO[]> {
+    return this.http.get<HistoryDTO[]>(`${this.apiUrl}/history/${id}`);
   }
 }

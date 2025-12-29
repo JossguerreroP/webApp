@@ -1,4 +1,5 @@
 package com.company.sigess.services;
+import com.company.sigess.models.DTO.HistoryDTO;
 import com.company.sigess.models.DTO.IncidentCriteria;
 import com.company.sigess.models.DTO.IncidentDTO;
 import com.company.sigess.repositories.HistoryDAO;
@@ -112,5 +113,10 @@ public class IncidentService implements IncidentInt {
         historyRepository.logChange(created.getId(), created.getCreatedBy(), "status", null, created.getStatus());
         
         return created;
+    }
+
+    @Override
+    public List<HistoryDTO> getIncidentHistory(int incidentId) {
+        return historyRepository.getHistoryByIncidentId(incidentId);
     }
 }

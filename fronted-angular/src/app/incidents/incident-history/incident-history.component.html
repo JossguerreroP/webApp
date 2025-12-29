@@ -1,0 +1,43 @@
+<div class="history-container">
+  <div class="history-header">
+    <h3>Historial del Incidente #{{ incidentId }}</h3>
+    <button class="btn-close" (click)="close()">&times;</button>
+  </div>
+
+  <div class="history-body">
+    <div *ngIf="isLoading" class="loading-state">
+      <p>Cargando historial...</p>
+    </div>
+
+    <div *ngIf="error" class="error-state">
+      <p>{{ error }}</p>
+    </div>
+
+    <div *ngIf="!isLoading && !error && history.length === 0" class="empty-state">
+      <p>No hay cambios registrados para este incidente.</p>
+    </div>
+
+    <div *ngIf="!isLoading && !error && history.length > 0" class="history-list">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Campo</th>
+            <th>Valor Anterior</th>
+            <th>Valor Nuevo</th>
+            <th>Cambiado por</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of history">
+            <td>{{ item.changedAt | date:'short' }}</td>
+            <td>{{ item.fieldName }}</td>
+            <td class="value-cell">{{ item.oldValue || '-' }}</td>
+            <td class="value-cell">{{ item.newValue }}</td>
+            <td>Usuario #{{ item.changedBy }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

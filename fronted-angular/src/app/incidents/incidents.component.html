@@ -128,4 +128,10 @@
       <app-create-incident [incident]="selectedIncident" (onClose)="closeCreateModal()"></app-create-incident>
     </div>
   </div>
+
+  <div class="modal-overlay" *ngIf="showHistoryModal" (click)="closeHistoryModal()">
+    <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+      <app-incident-history [incidentId]="historyIncidentId!" (onClose)="closeHistoryModal()"></app-incident-history>
+    </div>
+  </div>
 </div>
