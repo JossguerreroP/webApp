@@ -3,6 +3,49 @@
     <h2 class="title">Lista de Incidentes</h2>
   </div>
 
+  <div class="filters-card">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label>Búsqueda libre</label>
+        <input type="text" [(ngModel)]="criteria.searchTerm" placeholder="Buscar..." class="filter-input">
+      </div>
+      <div class="filter-group">
+        <label>Estado</label>
+        <select [(ngModel)]="criteria.status" class="filter-input">
+          <option value="">Todos</option>
+          <option *ngFor="let status of statusMap | keyvalue" [value]="status.key">{{ status.value }}</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Nivel</label>
+        <select [(ngModel)]="criteria.level" class="filter-input">
+          <option value="">Todos</option>
+          <option *ngFor="let level of levelMap | keyvalue" [value]="level.key">{{ level.value }}</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>ID Responsable</label>
+        <input type="number" [(ngModel)]="criteria.responsibleId" class="filter-input">
+      </div>
+      <div class="filter-group">
+        <label>ID Área</label>
+        <input type="number" [(ngModel)]="criteria.areaId" class="filter-input">
+      </div>
+      <div class="filter-group">
+        <label>Fecha Inicio</label>
+        <input type="date" [(ngModel)]="criteria.startDate" class="filter-input">
+      </div>
+      <div class="filter-group">
+        <label>Fecha Fin</label>
+        <input type="date" [(ngModel)]="criteria.endDate" class="filter-input">
+      </div>
+    </div>
+    <div class="filter-actions">
+      <button (click)="applyFilters()" class="btn-primary">Filtrar</button>
+      <button (click)="resetFilters()" class="btn-secondary">Restablecer</button>
+    </div>
+  </div>
+
   <div class="table-card">
     <table class="custom-table">
       <thead>
@@ -11,10 +54,21 @@
           <th>Título</th>
           <th>Descripción</th>
           <th>Tipo</th>
-          <th>Nivel</th>
+          <th (click)="changeSort('level')" class="clickable">
+            Nivel
+            <span class="sort-icon" *ngIf="criteria.sortBy === 'level'">
+              {{ criteria.sortOrder === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
           <th>Estado</th>
           <th>ID Responsable</th>
           <th>ID Área</th>
+          <th (click)="changeSort('createdAt')" class="clickable">
+            Fecha
+            <span class="sort-icon" *ngIf="criteria.sortBy === 'createdAt'">
+              {{ criteria.sortOrder === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -35,11 +89,18 @@
           </td>
           <td>{{ incident.responsibleId }}</td>
           <td>{{ incident.areaId }}</td>
+          <td>{{ incident.createdAt | date:'short' }}</td>
         </tr>
         <tr *ngIf="incidents.length === 0">
-          <td colspan="8" class="text-center empty-state">No se encontraron incidentes.</td>
+          <td colspan="9" class="text-center empty-state">No se encontraron incidentes.</td>
         </tr>
       </tbody>
     </table>
+
+    <div class="pagination">
+      <button (click)="changePage(criteria.page! - 1)" [disabled]="criteria.page === 0" class="btn-page">Anterior</button>
+      <span>Página {{ criteria.page! + 1 }}</span>
+      <button (click)="changePage(criteria.page! + 1)" [disabled]="incidents.length < (criteria.size || 10)" class="btn-page">Siguiente</button>
+    </div>
   </div>
 </div>

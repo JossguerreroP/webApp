@@ -12,17 +12,48 @@ export class IncidentsServiceService {
 
   constructor(private http: HttpClient) { }
 
-  getAllIncidents(criteria?: IncidentCriteria): Observable<Incident[]> {
+  getAllIncidents(criteria?: IncidentCriteria): Observable<any> {
     let params = new HttpParams();
     if (criteria) {
+      const size = criteria.size || 10;
+      const page = (criteria.page || 0) + 1; // Backend is 1-indexed
+
       Object.keys(criteria).forEach(key => {
-        const value = (criteria as any)[key];
-        if (value !== undefined && value !== null) {
+        let value = (criteria as any)[key];
+        if (value !== undefined && value !== null && value !== '') {
+          // Skip specialized handling keys and pagination keys already handled or to be handled
+          if (key === 'sortBy' || key === 'sortOrder' || key === 'page' || key === 'offset' || key === 'size') {
+            return;
+          }
+
+          // Format dates for LocalDateTime.parse() -> "yyyy-MM-ddTHH:mm:ss"
+          if ((key === 'startDate' || key === 'endDate') && typeof value === 'string') {
+            if (value.length === 10) { // yyyy-MM-dd
+              value = key === 'startDate' ? `${value}T00:00:00` : `${value}T23:59:59`;
+            } else if (value.includes(' ')) {
+              value = value.replace(' ', 'T');
+            }
+          }
+
           params = params.append(key, value.toString());
         }
       });
+
+      // Add pagination params
+      params = params.append('size', size.toString());
+      params = params.append('page', page.toString());
+
+      // Send sortBy and sortOrder as separate parameters
+      if (criteria.sortBy) {
+        params = params.append('sortBy', criteria.sortBy);
+      }
+      if (criteria.sortOrder) {
+        params = params.append('sortOrder', criteria.sortOrder);
+      }
     }
-    return this.http.get<Incident[]>(this.apiUrl, { params });
+
+    console.log('Sending request to:', this.apiUrl, 'with params:', params.toString());
+    return this.http.get<any>(this.apiUrl, { params });
   }
 
   getIncidentById(id: number): Observable<Incident> {

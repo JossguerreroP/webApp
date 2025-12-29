@@ -38,6 +38,7 @@ public class IncidentController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
         String pathInfo = req.getPathInfo();
         System.out.println("[DEBUG_LOG] GET pathInfo: " + pathInfo);
 
@@ -57,6 +58,7 @@ public class IncidentController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
         try {
             IncidentDTO incident = gson.fromJson(req.getReader(), IncidentDTO.class);
             if (incident.getCreatedBy() == 0) incident.setCreatedBy(1); 
@@ -70,6 +72,7 @@ public class IncidentController extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
         String pathInfo = req.getPathInfo();
         if (pathInfo == null || !pathInfo.matches("/\\d+")) {
             sendError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid ID");

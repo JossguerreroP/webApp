@@ -72,13 +72,13 @@ export const authInterceptor: HttpInterceptorFn = (
     const authHeader = authReq.headers.get('Authorization');
     console.log('[INTERCEPTOR] Header Authorization final:', authHeader?.substring(0, 50) + '...');
 
-    // Log específico para getGuests con validaciones de formato
-    if (req.url.includes('payments/start') && req.method === 'GET') {
+    // Log específico para incidentes con validaciones de formato
+    if (req.url.includes('api/incidents') && req.method === 'GET') {
       const bearerPrefix = 'Bearer ';
       const hasCorrectPrefix = authHeader?.startsWith(bearerPrefix);
       const tokenPart = authHeader?.substring(bearerPrefix.length);
 
-      console.log('🔍 [INTERCEPTOR-GETGUESTS] Validación del header Authorization:', {
+      console.log('🔍 [INTERCEPTOR-INCIDENTS] Validación del header Authorization:', {
         fullHeader: authHeader,
         hasCorrectPrefix: hasCorrectPrefix,
         headerLength: authHeader?.length,
@@ -92,9 +92,9 @@ export const authInterceptor: HttpInterceptorFn = (
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      // Log específico para errores en getGuests
-      if (req.url.includes('payments/start') && req.method === 'GET') {
-        console.error('🚨 [INTERCEPTOR-GETGUESTS] Error en petición:', {
+      // Log específico para errores en incidentes
+      if (req.url.includes('api/incidents') && req.method === 'GET') {
+        console.error('🚨 [INTERCEPTOR-INCIDENTS] Error en petición:', {
           status: error.status,
           statusText: error.statusText,
           message: error.message,
@@ -109,6 +109,20 @@ export const authInterceptor: HttpInterceptorFn = (
       if (error.status === 401) {
         return handle401Error(authReq, next, authService, tokenStorage);
       }
+
+      // Global error handling for other statuses
+      console.error(`[INTERCEPTOR] Global Error [${error.status}]:`, error.message);
+
+      if (error.status >= 500) {
+        // Log more info for 500 errors
+        console.error('[INTERCEPTOR] 500 Server Error Details:', {
+          url: error.url,
+          error: error.error,
+          message: error.message
+        });
+        console.error('[INTERCEPTOR] Server Error (5xx). Please contact support.');
+      }
+
       return throwError(() => error);
     })
   );

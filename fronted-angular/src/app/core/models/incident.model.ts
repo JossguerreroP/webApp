@@ -25,4 +25,5 @@ export interface IncidentCriteria {
   sortOrder?: string;
   startDate?: string;
   endDate?: string;
+  offset?: number;
 }
