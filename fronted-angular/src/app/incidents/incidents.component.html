@@ -103,4 +103,12 @@
       <button (click)="changePage(criteria.page! + 1)" [disabled]="incidents.length < (criteria.size || 10)" class="btn-page">Siguiente</button>
     </div>
   </div>
+
+  <button (click)="openCreateModal()" class="btn-primary">Crear Incidente</button>
+
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeCreateModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <app-create-incident (onClose)="closeCreateModal()"></app-create-incident>
+    </div>
+  </div>
 </div>

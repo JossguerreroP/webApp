@@ -3,16 +3,18 @@ import { IncidentsServiceService } from '../core/services/incidents-service.serv
 import { Incident, IncidentCriteria } from '../core/models/incident.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CreateIncidentComponent } from './create-incident/create-incident.component';
 
 @Component({
   selector: 'app-incidents',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CreateIncidentComponent],
   templateUrl: './incidents.component.html',
   styleUrl: './incidents.component.css'
 })
 export class IncidentsComponent implements OnInit {
   incidents: Incident[] = [];
+  showModal = false;
   criteria: IncidentCriteria = {
     status: '',
     level: '',
@@ -68,6 +70,15 @@ export class IncidentsComponent implements OnInit {
 
   applyFilters(): void {
     this.criteria.page = 0;
+    this.loadIncidents();
+  }
+
+  openCreateModal(): void {
+    this.showModal = true;
+  }
+
+  closeCreateModal(): void {
+    this.showModal = false;
     this.loadIncidents();
   }
 

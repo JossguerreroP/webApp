@@ -1,0 +1,30 @@
+.create-incident-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #edf2f7;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.create-incident-header h3 {
+  margin: 0;
+  color: #2d3748;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #a0aec0;
+  transition: color 0.2s;
+}
+
+.btn-close:hover {
+  color: #4a5568;
+}
+
+.create-incident-body {
+  padding: 1rem 0;
+}
