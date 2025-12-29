@@ -8,8 +8,12 @@ import java.util.List;
 public class UserService implements UserInt {
     private final UserDAO repository;
 
-    public UserService( ) {
-        this.repository = new UserDAO();
+    public UserService() {
+        this(new UserDAO());
+    }
+
+    public UserService(UserDAO repository) {
+        this.repository = repository;
     }
     @Override
     public List<UserDTO> getAllUsers() {

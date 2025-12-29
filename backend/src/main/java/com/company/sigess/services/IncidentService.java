@@ -39,10 +39,14 @@ public class IncidentService implements IncidentInt {
     );
 
     public IncidentService() {
-        this.repository = new IncidentDAO();
-        this.historyRepository = new HistoryDAO();
-        this.userRepository = new UserDAO();
-        this.attachmentRepository = new AttachmentDAO();
+        this(new IncidentDAO(), new HistoryDAO(), new UserDAO(), new AttachmentDAO());
+    }
+
+    public IncidentService(IncidentDAO repository, HistoryDAO historyRepository, UserDAO userRepository, AttachmentDAO attachmentRepository) {
+        this.repository = repository;
+        this.historyRepository = historyRepository;
+        this.userRepository = userRepository;
+        this.attachmentRepository = attachmentRepository;
     }
 
     @Override
