@@ -24,7 +24,7 @@ export class IncidentsComponent implements OnInit {
     status: '',
     level: '',
     page: 0,
-    size: 10,
+    size: 3,
     sortBy: 'createdAt',
     sortOrder: 'desc'
   };

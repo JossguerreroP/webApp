@@ -12,7 +12,7 @@ public class IncidentCriteria {
     private String searchTerm;
     
     private int page = 1;
-    private int size = 10;
+    private int size = 3;
     private String sortBy = "created_at";
     private String sortOrder = "DESC";
 
