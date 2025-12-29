@@ -1,0 +1,164 @@
+{
+	"info": {
+		"_postman_id": "3654e185-182e-4d2c-abcc-a654e5695974",
+		"name": "DEVSIGESS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "49538645",
+		"_collection_link": "https://sevasguerrero-3900617.postman.co/workspace/Guerrero-Sebastian's-Workspace~93e36984-ef14-4897-8a32-ad1d2d2ce639/collection/49538645-3654e185-182e-4d2c-abcc-a654e5695974?action=share&source=collection_link&creator=49538645"
+	},
+	"item": [
+		{
+			"name": "Incidents",
+			"item": [
+				{
+					"name": "get",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkFOQUxJU1RBIiwiaWF0IjoxNzY2OTYwMjQxLCJleHAiOjE3NjcwNDY2NDF9.8qtMweiqtqdGAUsAYMrywQzeqZUb178WMxyHSsXLVhQ"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/incidents"
+					},
+					"response": []
+				},
+				{
+					"name": "create INC",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkFOQUxJU1RBIiwiaWF0IjoxNzY2OTYwMjQxLCJleHAiOjE3NjcwNDY2NDF9.8qtMweiqtqdGAUsAYMrywQzeqZUb178WMxyHSsXLVhQ"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 67,\n  \"title\": \"INCIDENTE SUPERVISOR\",\n  \"description\": \"INCIDENTE SUPERVISOR TEST\",\n  \"type\": \"TEST\",\n  \"level\": \"bajo\",\n  \"status\": \"abierto\",\n  \"createdAt\": \"2025-12-29T05:58:18.379117\",\n  \"updatedAt\": \"2025-12-29T06:39:15.499942\",\n  \"responsibleId\": 2,\n  \"areaId\": 2,\n  \"createdBy\": 2,\n  \"version\": 3\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/incidents"
+					},
+					"response": []
+				},
+				{
+					"name": "attachments",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkFOQUxJU1RBIiwiaWF0IjoxNzY2OTYwMjQxLCJleHAiOjE3NjcwNDY2NDF9.8qtMweiqtqdGAUsAYMrywQzeqZUb178WMxyHSsXLVhQ"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/incidents/attachment/9"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "AttachMents",
+			"item": [
+				{
+					"name": "New Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkFOQUxJU1RBIiwiaWF0IjoxNzY2OTYwMjQxLCJleHAiOjE3NjcwNDY2NDF9.8qtMweiqtqdGAUsAYMrywQzeqZUb178WMxyHSsXLVhQ"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/incidents"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "History",
+			"item": [
+				{
+					"name": "Get History",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkFOQUxJU1RBIiwiaWF0IjoxNzY2OTYwMjQxLCJleHAiOjE3NjcwNDY2NDF9.8qtMweiqtqdGAUsAYMrywQzeqZUb178WMxyHSsXLVhQ"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/incidents/history/10"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "logIn",
+			"item": [
+				{
+					"name": "users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkFOQUxJU1RBIiwiaWF0IjoxNzY2OTYwMjQxLCJleHAiOjE3NjcwNDY2NDF9.8qtMweiqtqdGAUsAYMrywQzeqZUb178WMxyHSsXLVhQ"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/users/"
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IkFOQUxJU1RBIiwiaWF0IjoxNzY2OTYwMjQxLCJleHAiOjE3NjcwNDY2NDF9.8qtMweiqtqdGAUsAYMrywQzeqZUb178WMxyHSsXLVhQ"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"analista\",\n  \"password\": \"analista123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/login/"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
