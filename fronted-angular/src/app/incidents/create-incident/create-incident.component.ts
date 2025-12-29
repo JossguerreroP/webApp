@@ -1,16 +1,80 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { IncidentsServiceService } from '../../core/services/incidents-service.service';
 
 @Component({
   selector: 'app-create-incident',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './create-incident.component.html',
   styleUrl: './create-incident.component.css'
 })
-export class CreateIncidentComponent {
+export class CreateIncidentComponent implements OnInit {
   @Output() onClose = new EventEmitter<void>();
+  incidentForm: FormGroup;
+  isSubmitting = false;
+
+  readonly statusMap = [
+    { key: 'abierto', value: 'Abierto' },
+    { key: 'analisis', value: 'En Análisis' },
+    { key: 'en progreso', value: 'En Progreso' },
+    { key: 'cerrado', value: 'Cerrado' }
+  ];
+
+  readonly levelMap = [
+    { key: 'bajo', value: 'Bajo' },
+    { key: 'medio', value: 'Medio' },
+    { key: 'alto', value: 'Alto' },
+    { key: 'critico', value: 'Crítico' }
+  ];
+
+  constructor(
+    private fb: FormBuilder,
+    private incidentService: IncidentsServiceService
+  ) {
+    this.incidentForm = this.fb.group({
+      title: ['', [Validators.required, Validators.minLength(5)]],
+      description: ['', [Validators.required, Validators.minLength(10)]],
+      type: ['', Validators.required],
+      level: ['bajo', Validators.required],
+      status: ['abierto', Validators.required],
+      responsibleId: [null, [Validators.required, Validators.min(1)]],
+      areaId: [null, [Validators.required, Validators.min(1)]]
+    });
+  }
+
+  ngOnInit(): void {}
+
+  onSubmit(): void {
+    if (this.incidentForm.valid) {
+      this.isSubmitting = true;
+      this.incidentService.createIncident(this.incidentForm.value).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.close();
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          console.error('Error creating incident:', err);
+          alert('Error al crear el incidente. Por favor, intente de nuevo.');
+        }
+      });
+    } else {
+      this.markFormGroupTouched(this.incidentForm);
+    }
+  }
 
   close() {
     this.onClose.emit();
+  }
+
+  private markFormGroupTouched(formGroup: FormGroup) {
+    Object.values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
+      if ((control as any).controls) {
+        this.markFormGroupTouched(control as FormGroup);
+      }
+    });
   }
 }

@@ -47,55 +47,72 @@
   </div>
 
   <div class="table-card">
-    <table class="custom-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Título</th>
-          <th>Descripción</th>
-          <th>Tipo</th>
-          <th (click)="changeSort('level')" class="clickable">
-            Nivel
-            <span class="sort-icon" *ngIf="criteria.sortBy === 'level'">
-              {{ criteria.sortOrder === 'asc' ? '▲' : '▼' }}
-            </span>
-          </th>
-          <th>Estado</th>
-          <th>ID Responsable</th>
-          <th>ID Área</th>
-          <th (click)="changeSort('createdAt')" class="clickable">
-            Fecha
-            <span class="sort-icon" *ngIf="criteria.sortBy === 'createdAt'">
-              {{ criteria.sortOrder === 'asc' ? '▲' : '▼' }}
-            </span>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let incident of incidents">
-          <td>#{{ incident.id }}</td>
-          <td><strong>{{ incident.title }}</strong></td>
-          <td>{{ incident.description }}</td>
-          <td>{{ incident.type }}</td>
-          <td>
-            <span class="badge" [ngClass]="getLevelClass(incident.level)">
-              {{ translateLevel(incident.level) }}
-            </span>
-          </td>
-          <td>
-            <span class="badge" [ngClass]="getStatusClass(incident.status)">
-              {{ translateStatus(incident.status) }}
-            </span>
-          </td>
-          <td>{{ incident.responsibleId }}</td>
-          <td>{{ incident.areaId }}</td>
-          <td>{{ incident.createdAt | date:'short' }}</td>
-        </tr>
-        <tr *ngIf="incidents.length === 0">
-          <td colspan="9" class="text-center empty-state">No se encontraron incidentes.</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Descripción</th>
+            <th>Tipo</th>
+            <th (click)="changeSort('level')" class="clickable">
+              Nivel
+              <span class="sort-icon" *ngIf="criteria.sortBy === 'level'">
+                {{ criteria.sortOrder === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+            <th>Estado</th>
+            <th>ID Responsable</th>
+            <th>ID Área</th>
+            <th (click)="changeSort('createdAt')" class="clickable">
+              Fecha
+              <span class="sort-icon" *ngIf="criteria.sortBy === 'createdAt'">
+                {{ criteria.sortOrder === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+            <th class="actions-header">ACCIONES</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let incident of incidents">
+            <td>#{{ incident.id }}</td>
+            <td><strong>{{ incident.title }}</strong></td>
+            <td>{{ incident.description }}</td>
+            <td>{{ incident.type }}</td>
+            <td>
+              <span class="badge" [ngClass]="getLevelClass(incident.level)">
+                {{ translateLevel(incident.level) }}
+              </span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="getStatusClass(incident.status)">
+                {{ translateStatus(incident.status) }}
+              </span>
+            </td>
+            <td>{{ incident.responsibleId }}</td>
+            <td>{{ incident.areaId }}</td>
+            <td>{{ incident.createdAt | date:'short' }}</td>
+            <td class="actions-cell">
+              <button class="btn-action btn-edit" (click)="editIncident(incident)" title="Editar">
+                <i class="icon-edit">Editar</i>
+              </button>
+              <button class="btn-action btn-delete" (click)="deleteIncident(incident.id)" title="Eliminar">
+                <i class="icon-delete">Eliminar</i>
+              </button>
+              <button class="btn-action btn-history" (click)="viewHistory(incident.id)" title="Historial">
+                <i class="icon-history">Historial</i>
+              </button>
+              <button class="btn-action btn-attachment" (click)="viewAttachments(incident.id)" title="Adjuntos">
+                <i class="icon-attachment">adjuntos</i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="incidents.length === 0">
+            <td colspan="10" class="text-center empty-state">No se encontraron incidentes.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="pagination">
       <button (click)="changePage(criteria.page! - 1)" [disabled]="criteria.page === 0" class="btn-page">Anterior</button>

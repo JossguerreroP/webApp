@@ -151,4 +151,29 @@ export class IncidentsComponent implements OnInit {
       return accents[match];
     }));
   }
+
+  editIncident(incident: Incident): void {
+    console.log('Edit incident:', incident);
+    // TODO: Implement edit logic
+  }
+
+  deleteIncident(id: number | undefined): void {
+    if (id === undefined) return;
+    if (confirm('¿Está seguro de que desea eliminar este incidente?')) {
+      console.log('Delete incident:', id);
+      // TODO: Implement delete logic
+    }
+  }
+
+  viewHistory(id: number | undefined): void {
+    if (id === undefined) return;
+    console.log('View history for incident:', id);
+    // TODO: Implement history logic
+  }
+
+  viewAttachments(id: number | undefined): void {
+    if (id === undefined) return;
+    console.log('View attachments for incident:', id);
+    // TODO: Implement attachments logic
+  }
 }

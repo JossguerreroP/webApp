@@ -3,5 +3,74 @@
   <button class="btn-close" (click)="close()">&times;</button>
 </div>
 <div class="create-incident-body">
-  <p>Aquí irá el formulario para crear un incidente.</p>
+  <form [formGroup]="incidentForm" (ngSubmit)="onSubmit()" class="incident-form">
+    <div class="form-group">
+      <label for="title">Título</label>
+      <input id="title" type="text" formControlName="title" placeholder="Ingrese el título del incidente" class="form-input">
+      <div *ngIf="incidentForm.get('title')?.touched && incidentForm.get('title')?.invalid" class="error-message">
+        <small *ngIf="incidentForm.get('title')?.errors?.['required']">El título es requerido.</small>
+        <small *ngIf="incidentForm.get('title')?.errors?.['minlength']">Mínimo 5 caracteres.</small>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Descripción</label>
+      <textarea id="description" formControlName="description" placeholder="Describa el incidente" class="form-input" rows="3"></textarea>
+      <div *ngIf="incidentForm.get('description')?.touched && incidentForm.get('description')?.invalid" class="error-message">
+        <small *ngIf="incidentForm.get('description')?.errors?.['required']">La descripción es requerida.</small>
+        <small *ngIf="incidentForm.get('description')?.errors?.['minlength']">Mínimo 10 caracteres.</small>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="type">Tipo</label>
+        <input id="type" type="text" formControlName="type" placeholder="Ej: Técnico, Red, etc." class="form-input">
+        <div *ngIf="incidentForm.get('type')?.touched && incidentForm.get('type')?.invalid" class="error-message">
+          <small *ngIf="incidentForm.get('type')?.errors?.['required']">El tipo es requerido.</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="level">Nivel</label>
+        <select id="level" formControlName="level" class="form-input">
+          <option *ngFor="let level of levelMap" [value]="level.key">{{ level.value }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="status">Estado</label>
+        <select id="status" formControlName="status" class="form-input">
+          <option *ngFor="let status of statusMap" [value]="status.key">{{ status.value }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="responsibleId">ID Responsable</label>
+        <input id="responsibleId" type="number" formControlName="responsibleId" class="form-input">
+        <div *ngIf="incidentForm.get('responsibleId')?.touched && incidentForm.get('responsibleId')?.invalid" class="error-message">
+          <small *ngIf="incidentForm.get('responsibleId')?.errors?.['required']">ID requerido.</small>
+          <small *ngIf="incidentForm.get('responsibleId')?.errors?.['min']">Mínimo 1.</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="areaId">ID Área</label>
+      <input id="areaId" type="number" formControlName="areaId" class="form-input">
+      <div *ngIf="incidentForm.get('areaId')?.touched && incidentForm.get('areaId')?.invalid" class="error-message">
+        <small *ngIf="incidentForm.get('areaId')?.errors?.['required']">ID de área requerido.</small>
+        <small *ngIf="incidentForm.get('areaId')?.errors?.['min']">Mínimo 1.</small>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" (click)="close()" class="btn-secondary" [disabled]="isSubmitting">Cancelar</button>
+      <button type="submit" class="btn-primary" [disabled]="incidentForm.invalid || isSubmitting">
+        {{ isSubmitting ? 'Guardando...' : 'Crear Incidente' }}
+      </button>
+    </div>
+  </form>
 </div>

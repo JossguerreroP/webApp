@@ -23,12 +23,20 @@
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   overflow: hidden;
+  width: 100%;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .custom-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  min-width: 1000px; /* Ensure table doesn't shrink too much, forcing scroll */
 }
 
 .custom-table thead {
@@ -93,11 +101,6 @@
 @media (max-width: 768px) {
   .incidents-container {
     padding: 1rem;
-  }
-
-  .custom-table {
-    display: block;
-    overflow-x: auto;
   }
 }
 
@@ -228,4 +231,85 @@
 .btn-page:disabled {
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+/* Actions cell */
+.actions-header {
+  text-align: center;
+  min-width: 120px;
+}
+
+.actions-cell {
+  text-align: center;
+  padding: 0.8rem 0.5rem !important;
+  vertical-align: middle;
+}
+
+.actions-cell .btn-action {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 0.4rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.actions-cell .btn-action:last-child {
+  margin-bottom: 0;
+}
+
+.btn-edit {
+  background-color: #ebf8ff;
+  color: #3182ce;
+  border-color: #bee3f8 !important;
+}
+
+.btn-edit:hover {
+  background-color: #3182ce;
+  color: white;
+}
+
+.btn-delete {
+  background-color: #fff5f5;
+  color: #e53e3e;
+  border-color: #fed7d7 !important;
+}
+
+.btn-delete:hover {
+  background-color: #e53e3e;
+  color: white;
+}
+
+.btn-history {
+  background-color: #f7fafc;
+  color: #4a5568;
+  border-color: #e2e8f0 !important;
+}
+
+.btn-history:hover {
+  background-color: #4a5568;
+  color: white;
+}
+
+.btn-attachment {
+  background-color: #f0fff4;
+  color: #38a169;
+  border-color: #c6f6d5 !important;
+}
+
+.btn-attachment:hover {
+  background-color: #38a169;
+  color: white;
+}
+
+.icon-edit, .icon-delete, .icon-history, .icon-attachment {
+  font-style: normal;
 }
