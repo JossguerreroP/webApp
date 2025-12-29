@@ -4,13 +4,14 @@ import { Observable } from 'rxjs';
 import { Incident, IncidentCriteria } from '../models/incident.model';
 import { HistoryDTO } from '../models/history.model';
 import { AttachmentDTO } from '../models/attachment.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class IncidentsServiceService {
 
-  private apiUrl = 'http://localhost:8080/api/incidents';
+  private apiUrl = `${environment.apiUrl}/incidents`;
 
   constructor(private http: HttpClient) { }
 
