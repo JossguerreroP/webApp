@@ -81,7 +81,7 @@
 .badge-status-open { background-color: #e3f2fd; color: #1976d2; }
 .badge-status-in_analysis { background-color: #e1f5fe; color: #0288d1; }
 .badge-status-in_progress { background-color: #fff3e0; color: #f57c00; }
-.badge-status-closed { background-color: #e8f5e9; color: #388e3c; }
+.badge-status-closed { background-color: #ffebee; color: #d32f2f; }
 
 .badge-level-low { background-color: #e8f5e9; color: #388e3c; }
 .badge-level-medium { background-color: #fffde7; color: #fbc02d; }
