@@ -43,8 +43,14 @@
       <div class="form-group">
         <label for="status">Estado</label>
         <select id="status" formControlName="status" class="form-input">
-          <option *ngFor="let status of statusMap" [value]="status.key">{{ status.value }}</option>
+          <option *ngFor="let status of statusMap" [value]="status.key"
+                  [disabled]="!isSupervisor() && (status.key === 'abierto' || status.key === 'cerrado')">
+            {{ status.value }}
+          </option>
         </select>
+        <div *ngIf="!isSupervisor() && (incidentForm.get('status')?.value === 'abierto' || incidentForm.get('status')?.value === 'cerrado') && incident" class="info-message">
+          <small>Solo un Supervisor puede establecer este estado.</small>
+        </div>
       </div>
     </div>
 

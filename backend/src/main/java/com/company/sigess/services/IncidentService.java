@@ -51,13 +51,13 @@ public class IncidentService implements IncidentInt {
 
         boolean isSupervisor = "SUPERVISOR".equalsIgnoreCase(user.role());
 
-        // Validar cambio de estado (Solo Supervisor puede cerrar/reabrir)
-        if (!existing.getStatus().equals(incident.getStatus())) {
-            boolean switchingToClosed = "cerrado".equalsIgnoreCase(incident.getStatus());
-            boolean switchingFromClosed = "cerrado".equalsIgnoreCase(existing.getStatus());
+        // Validar cambio de estado (Solo Supervisor puede abrir o cerrar)
+        if (!existing.getStatus().equalsIgnoreCase(incident.getStatus())) {
+            boolean isMovingToClosed = "cerrado".equalsIgnoreCase(incident.getStatus());
+            boolean isMovingToOpen = "abierto".equalsIgnoreCase(incident.getStatus());
 
-            if ((switchingToClosed || switchingFromClosed) && !isSupervisor) {
-                throw new RuntimeException("Solo un Supervisor puede cerrar o reabrir incidentes");
+            if ((isMovingToClosed || isMovingToOpen) && !isSupervisor) {
+                throw new RuntimeException("Solo un Supervisor puede abrir o cerrar incidentes");
             }
         }
 
@@ -84,6 +84,12 @@ public class IncidentService implements IncidentInt {
             if (principal != null) {
                 userId = principal.getUserId().intValue();
             }
+        }
+
+        // Regla de Negocio: Roles (Solo Supervisor puede cerrar/eliminar)
+        com.company.sigess.models.DTO.UserDTO user = userRepository.findById(userId);
+        if (user == null || !"SUPERVISOR".equalsIgnoreCase(user.role())) {
+            throw new RuntimeException("Solo un Supervisor puede cerrar incidentes");
         }
 
         String oldStatus = existing.getStatus();

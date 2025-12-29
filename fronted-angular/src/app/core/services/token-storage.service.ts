@@ -46,4 +46,16 @@ export class TokenStorageService {
       return null;
     }
   }
+
+  getUserRole(): string | null {
+    const token = this.getAccessToken();
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.role || null;
+    } catch (e) {
+      console.error('Error decoding token', e);
+      return null;
+    }
+  }
 }

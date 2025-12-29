@@ -48,6 +48,10 @@ export class CreateIncidentComponent implements OnInit {
     });
   }
 
+  isSupervisor(): boolean {
+    return this.tokenStorage.getUserRole() === 'SUPERVISOR';
+  }
+
   ngOnInit(): void {
     if (this.incident) {
       this.incidentForm.patchValue({

@@ -48,6 +48,10 @@ export class IncidentsComponent implements OnInit {
     private tokenStorage: TokenStorageService
   ) {}
 
+  isSupervisor(): boolean {
+    return this.tokenStorage.getUserRole() === 'SUPERVISOR';
+  }
+
   ngOnInit(): void {
     this.loadIncidents();
   }
